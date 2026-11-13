@@ -1,4 +1,5 @@
 import React from 'react';
+import { DatabaseLabPage } from './pages/DatabaseLabPage';
 import { BrowserRouter, Routes, Route, Navigate, useOutletContext } from 'react-router-dom';
 import { ToastProvider } from './context/ToastContext';
 import { AuthProvider } from './context/AuthContext';
@@ -85,6 +86,7 @@ export const App: React.FC = () => {
 
               {/* Main App Layout */}
               <Route element={<AppLayout />}>
+                <Route path="/database-lab" element={<DatabaseLabPage />} />
                 <Route path="/dashboard" element={<DashboardRoute />} />
                 <Route path="/explore" element={<ExploreRoute />} />
                 <Route path="/spaces/:id" element={<SpaceDetailRoute />} />

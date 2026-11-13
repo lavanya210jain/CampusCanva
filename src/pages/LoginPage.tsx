@@ -1,3 +1,4 @@
+import { DatabaseStatus } from '../components/common/DatabaseStatus';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Layers, Eye, EyeOff, Lock, Mail, ArrowRight, ShieldCheck, Sparkles } from 'lucide-react';
@@ -10,7 +11,7 @@ export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState('kavya.cse@nsut.ac.in');
-  const [password, setPassword] = useState('demo1234');
+  const [password, setPassword] = useState('CampusCanva123!');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -37,7 +38,7 @@ export const LoginPage: React.FC = () => {
   };
 
   const handleQuickDemo = async (userId: number) => {
-    await switchUser(userId);
+    try { await switchUser(userId); } catch { return; }
     navigate('/dashboard');
   };
 
@@ -61,6 +62,7 @@ export const LoginPage: React.FC = () => {
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-6 sm:px-10 shadow-xl border border-slate-200/80 rounded-3xl space-y-6">
+          <DatabaseStatus />
           {/* Quick Demo Access Bar */}
           <div className="p-4 rounded-2xl bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-100">
             <div className="flex items-center gap-2 mb-2">

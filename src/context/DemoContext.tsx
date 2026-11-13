@@ -23,16 +23,16 @@ export const DemoProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsDemoMode((prev) => !prev);
   };
 
-  const openInspector = (type: 'space' | 'media' | 'user' | 'comment', id: number) => {
+  const openInspector = async (type: 'space' | 'media' | 'user' | 'comment', id: number) => {
     try {
-      const data = api.getDBMSMeta(type, id);
+      const data = await api.getDBMSMeta(type, id);
       // Ensure password_hash is scrubbed if present
       if (data.attributes && 'password_hash' in data.attributes) {
         delete (data.attributes as Record<string, unknown>).password_hash;
       }
       setInspectorData(data);
     } catch (e) {
-      console.error(e);
+      showToast(e instanceof Error ? e.message : 'Cannot inspect this record', 'error');
     }
   };
 

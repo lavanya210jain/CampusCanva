@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { FullUserProfile, User, Student, Alumni, Faculty } from '../types';
-import { api } from '../services/api';
+import { FullUserProfile, RegistrationInput, User, Student, Alumni, Faculty } from '../types';
+import { api, isMockMode } from '../services/api';
+import { sessionApi } from '../services/liveApi';
 import { useToast } from './ToastContext';
 
 interface AuthContextValue {
@@ -10,7 +11,7 @@ interface AuthContextValue {
   allUsers: User[];
   login: (email: string, passwordHash?: string) => Promise<void>;
   register: (
-    userData: Omit<User, 'user_id' | 'joined_at'>,
+    userData: RegistrationInput,
     specialized: {
       student?: Omit<Student, 'user_id'>;
       alumni?: Omit<Alumni, 'user_id'>;
@@ -45,6 +46,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const initAuth = async () => {
       try {
+        if (!isMockMode) {
+          try {
+            const profile = await sessionApi.me();
+            setCurrentUser(profile);
+            await refreshUsers();
+          } catch (error) {
+            if ((error as {status?:number}).status !== 401) showToast(error instanceof Error ? error.message : 'API connection failed', 'error');
+          }
+          return;
+        }
         await refreshUsers();
         const storedUserId = localStorage.getItem(AUTH_STORAGE_KEY);
         // Default to user_id: 1 (Kavya Gupta, Student Lead) for immediate seamless demo
@@ -69,6 +80,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const user = await api.login(email, passwordHash);
       setCurrentUser(user);
       localStorage.setItem(AUTH_STORAGE_KEY, user.user_id.toString());
+      await refreshUsers();
       showToast(`Welcome back, ${user.full_name}!`, 'success');
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Login failed';
@@ -80,7 +92,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const register = async (
-    userData: Omit<User, 'user_id' | 'joined_at'>,
+    userData: RegistrationInput,
     specialized: {
       student?: Omit<Student, 'user_id'>;
       alumni?: Omit<Alumni, 'user_id'>;
@@ -103,22 +115,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    if (!isMockMode) {
+      try { await sessionApi.logout(); } catch (error) { showToast(error instanceof Error ? error.message : 'Logout failed', 'error'); return; }
+    }
     setCurrentUser(null);
+    setAllUsers([]);
     localStorage.removeItem(AUTH_STORAGE_KEY);
-    showToast('Logged out of demo session.', 'info');
+    showToast('Signed out.', 'info');
   };
 
   const switchUser = async (userId: number) => {
     try {
-      const user = await api.getUserProfile(userId);
+      const user = isMockMode ? await api.getUserProfile(userId) : await sessionApi.demo(userId);
       if (user) {
         setCurrentUser(user);
         localStorage.setItem(AUTH_STORAGE_KEY, user.user_id.toString());
+        await refreshUsers();
         showToast(`Switched active persona to ${user.full_name} (${user.user_type})`, 'info');
       }
     } catch (err) {
-      showToast('Could not switch user', 'error');
+      showToast(err instanceof Error ? err.message : 'Could not switch user', 'error');
+      throw err;
     }
   };
 
@@ -130,7 +148,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await refreshUsers();
       showToast('Profile updated successfully!', 'success');
     } catch (err) {
-      showToast('Failed to update profile', 'error');
+      showToast(err instanceof Error ? err.message : 'Failed to update profile', 'error');
+      throw err;
     }
   };
 

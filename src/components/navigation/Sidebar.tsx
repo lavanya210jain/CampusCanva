@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import {
+  Database,
   Home,
   Compass,
   FolderHeart,
@@ -13,6 +14,7 @@ import {
   Info,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { isMockMode } from '../../services/api';
 import { useDemo } from '../../context/DemoContext';
 import { ConfirmDialog } from '../common/ConfirmDialog';
 
@@ -32,6 +34,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ unreadCount = 0 }) => {
     { name: 'Campus Spots', path: '/spots', icon: MapPin },
     { name: 'Time Capsules', path: '/time-capsules', icon: Clock },
     { name: 'Notifications', path: '/notifications', icon: Bell, badge: unreadCount },
+    { name: 'Database Lab', path: '/database-lab', icon: Database },
     { name: 'My Profile', path: '/profile', icon: User },
   ];
 
@@ -105,15 +108,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ unreadCount = 0 }) => {
             </div>
           )}
 
-          {/* Reset Demo Data Button */}
-          <button
+          {/* MySQL reset is an explicit CLI operation, never a UI action. */}
+          {isMockMode && <button
             onClick={() => setShowResetConfirm(true)}
             className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-medium text-slate-600 hover:text-rose-600 hover:bg-rose-50 border border-slate-200 hover:border-rose-200 rounded-xl transition"
             title="Reset database to initial seeded state"
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            <span>Reset Database Seeds</span>
-          </button>
+            <span>Reset Practice Data</span>
+          </button>}
         </div>
       </aside>
 

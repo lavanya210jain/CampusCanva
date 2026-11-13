@@ -1,3 +1,4 @@
+import { useDialog } from '../../hooks/useDialog';
 import React, { useState, useEffect } from 'react';
 import {
   X,
@@ -24,7 +25,7 @@ import { ImageWithFallback } from '../common/ImageWithFallback';
 interface MediaLightboxModalProps {
   media: MediaItem | null;
   onClose: () => void;
-  onDeleteMedia?: (mediaId: number) => void;
+  onDeleteMedia?: (mediaId: number) => Promise<void>;
 }
 
 export const MediaLightboxModal: React.FC<MediaLightboxModalProps> = ({
@@ -42,6 +43,8 @@ export const MediaLightboxModal: React.FC<MediaLightboxModalProps> = ({
   const [taggedUsers, setTaggedUsers] = useState<FullUserProfile[]>([]);
   const [newCommentText, setNewCommentText] = useState('');
   const [submittingComment, setSubmittingComment] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [canAdmin, setCanAdmin] = useState(false);
 
   useEffect(() => {
     if (!media) return;
@@ -49,6 +52,8 @@ export const MediaLightboxModal: React.FC<MediaLightboxModalProps> = ({
     // Load related relational data
     const loadMediaDetails = async () => {
       try {
+        const members = await api.getSpaceMembers(media.space_id);
+        setCanAdmin(members.some(member => member.user_id === currentUser?.user_id && member.role_type === 'Admin'));
         const u = await api.getUserProfile(media.uploader_id);
         setUploader(u);
 
@@ -66,8 +71,9 @@ export const MediaLightboxModal: React.FC<MediaLightboxModalProps> = ({
     };
 
     loadMediaDetails();
-  }, [media]);
+  }, [media, currentUser?.user_id]);
 
+  const dialogRef = useDialog(!!media, onClose);
   if (!media) return null;
 
   // Reaction counts & states
@@ -112,7 +118,7 @@ export const MediaLightboxModal: React.FC<MediaLightboxModalProps> = ({
       const created = await api.addComment(media.media_id, currentUser.user_id, newCommentText.trim());
       setComments((prev) => [...prev, created]);
       setNewCommentText('');
-      showToast('Comment posted! (Weak entity key assigned)', 'success');
+      showToast('Comment posted!', 'success');
     } catch (e) {
       showToast('Failed to post comment', 'error');
     } finally {
@@ -130,10 +136,10 @@ export const MediaLightboxModal: React.FC<MediaLightboxModalProps> = ({
     }
   };
 
-  const canDeleteMedia = currentUser?.user_id === media.uploader_id;
+  const canDeleteMedia = canAdmin || currentUser?.user_id === media.uploader_id;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in">
+    <div ref={dialogRef} role="dialog" aria-modal="true" aria-label="Campus memory" className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in">
       <div className="bg-white rounded-3xl max-w-5xl w-full max-h-[92vh] overflow-hidden shadow-2xl border border-slate-800 flex flex-col md:flex-row">
         {/* Left: Media Viewport */}
         <div className="md:w-3/5 bg-slate-950 flex flex-col items-center justify-center relative min-h-[300px] md:min-h-[560px]">
@@ -192,11 +198,13 @@ export const MediaLightboxModal: React.FC<MediaLightboxModalProps> = ({
             <div className="flex items-center gap-1">
               {canDeleteMedia && onDeleteMedia && (
                 <button
-                  onClick={() => {
-                    if (confirm('Delete this memory?')) {
-                      onDeleteMedia(media.media_id);
-                      onClose();
-                    }
+                  disabled={deleting}
+                  onClick={async () => {
+                    if (!confirm('Delete this memory?')) return;
+                    setDeleting(true);
+                    try { await onDeleteMedia(media.media_id); showToast('Memory deleted','success'); onClose(); }
+                    catch (error) { showToast(error instanceof Error ? error.message : 'Delete failed','error'); }
+                    finally { setDeleting(false); }
                   }}
                   className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg transition"
                   title="Delete media item"
@@ -278,7 +286,7 @@ export const MediaLightboxModal: React.FC<MediaLightboxModalProps> = ({
                         <p className="text-slate-700 mt-0.5 leading-snug break-words">{c.comment_text}</p>
                       </div>
 
-                      {currentUser?.user_id === c.user_id && (
+                      {(canAdmin || currentUser?.user_id === c.user_id) && (
                         <button
                           onClick={() => handleDeleteComment(c.comment_no)}
                           className="opacity-0 group-hover:opacity-100 p-1 text-slate-400 hover:text-rose-600 transition"

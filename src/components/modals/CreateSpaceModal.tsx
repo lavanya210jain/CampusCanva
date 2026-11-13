@@ -1,3 +1,4 @@
+import { useDialog } from '../../hooks/useDialog';
 import React, { useState } from 'react';
 import { X, Lock, Sparkles, Image as ImageIcon, MapPin } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -38,6 +39,7 @@ export const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
   const [unlockDate, setUnlockDate] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
+  const dialogRef = useDialog(isOpen, onClose);
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -91,7 +93,7 @@ export const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-fade-in overflow-y-auto">
+    <div ref={dialogRef} role="dialog" aria-modal="true" aria-label="Create memory space" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-fade-in overflow-y-auto">
       <div className="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl border border-slate-100 my-8">
         <div className="flex items-center justify-between pb-4 border-b border-slate-100">
           <div className="flex items-center gap-3">

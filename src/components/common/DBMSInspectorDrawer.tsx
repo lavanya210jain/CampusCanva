@@ -1,3 +1,4 @@
+import { useDialog } from '../../hooks/useDialog';
 import React from 'react';
 import { Database, Key, GitFork, Code2, X, ShieldCheck } from 'lucide-react';
 import { useDemo } from '../../context/DemoContext';
@@ -5,10 +6,11 @@ import { useDemo } from '../../context/DemoContext';
 export const DBMSInspectorDrawer: React.FC = () => {
   const { inspectorData, closeInspector } = useDemo();
 
+  const dialogRef = useDialog(!!inspectorData, closeInspector);
   if (!inspectorData) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-slate-900/30 backdrop-blur-xs transition-opacity animate-fade-in">
+    <div ref={dialogRef} role="dialog" aria-modal="true" aria-label="DBMS Schema Inspector" className="fixed inset-0 z-[60] flex justify-end bg-slate-900/30 backdrop-blur-xs transition-opacity animate-fade-in">
       <div className="w-full max-w-lg bg-white h-full shadow-2xl border-l border-slate-200 flex flex-col overflow-hidden animate-slide-left">
         {/* Drawer Header */}
         <div className="p-5 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
@@ -27,6 +29,7 @@ export const DBMSInspectorDrawer: React.FC = () => {
             </div>
           </div>
           <button
+            aria-label="Close SQL inspector"
             onClick={closeInspector}
             className="text-slate-400 hover:text-slate-700 p-1.5 rounded-lg hover:bg-slate-200 transition"
           >

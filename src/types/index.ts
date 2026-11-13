@@ -8,11 +8,13 @@ export interface User {
   email: string;
   phone?: string;
   user_type: UserType;
-  password_hash: string;
   avatar_url: string;
   bio?: string;
   joined_at: string;
 }
+
+// Passwords are submitted only during registration and never returned in public profiles.
+export type RegistrationInput = Omit<User, 'user_id' | 'joined_at'> & { password: string };
 
 // Specialization: Student ISA User
 export interface Student {
@@ -80,6 +82,7 @@ export type MediaType = 'PHOTO' | 'VIDEO';
 
 export interface MediaItem {
   media_id: number;
+  reaction_count?: number;
   space_id: number; // FK -> memory_space
   uploader_id: number; // FK -> users
   media_url: string;

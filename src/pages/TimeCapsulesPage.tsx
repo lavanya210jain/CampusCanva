@@ -1,3 +1,4 @@
+import { DataError } from '../components/common/DataError';
 import React, { useState, useEffect } from 'react';
 import { Clock, Lock, Unlock, Sparkles, PlusCircle } from 'lucide-react';
 import { api } from '../services/api';
@@ -14,6 +15,7 @@ export const TimeCapsulesPage: React.FC<TimeCapsulesPageProps> = ({ onOpenCreate
   const [mediaList, setMediaList] = useState<MediaItem[]>([]);
   const [filter, setFilter] = useState<'all' | 'locked' | 'unlocked'>('all');
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -27,7 +29,7 @@ export const TimeCapsulesPage: React.FC<TimeCapsulesPageProps> = ({ onOpenCreate
         setSpots(st);
         setMediaList(me);
       } catch (e) {
-        console.error(e);
+        setLoadError(e instanceof Error ? e.message : 'Could not load data');
       } finally {
         setLoading(false);
       }
@@ -44,6 +46,7 @@ export const TimeCapsulesPage: React.FC<TimeCapsulesPageProps> = ({ onOpenCreate
 
   return (
     <div className="space-y-8 pb-16">
+      <DataError message={loadError} />
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>

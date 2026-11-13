@@ -53,8 +53,8 @@ export const RegisterPage: React.FC = () => {
       setErrorMsg('Passwords do not match.');
       return;
     }
-    if (password.length < 6) {
-      setErrorMsg('Password should be at least 6 characters.');
+    if (password.length < 8) {
+      setErrorMsg('Password should be at least 8 characters.');
       return;
     }
 
@@ -94,7 +94,7 @@ export const RegisterPage: React.FC = () => {
           email: email.trim(),
           phone: phone.trim() || undefined,
           user_type: userType,
-          password_hash: 'hashed_' + password,
+          password,
           avatar_url: `https://images.unsplash.com/photo-${
             userType === 'STUDENT'
               ? '1534528741775-53994a69daeb'

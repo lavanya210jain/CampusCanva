@@ -15,7 +15,7 @@ import {
   NotificationItem,
 } from '../types';
 
-export const SEED_USERS: User[] = [
+export const SEED_USERS: (User & { password_hash: string })[] = [
   {
     user_id: 1,
     full_name: 'Kavya Gupta',

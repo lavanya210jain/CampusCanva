@@ -1,5 +1,6 @@
 import {
   User,
+  RegistrationInput,
   Student,
   Alumni,
   Faculty,
@@ -126,7 +127,7 @@ class RelationalDatabaseService {
 
   // Atomic Registration simulating SQL Transaction with ISA Subtype insertion
   public registerUser(
-    userData: Omit<User, 'user_id' | 'joined_at'>,
+    userData: RegistrationInput,
     specializedData: {
       student?: Omit<Student, 'user_id'>;
       alumni?: Omit<Alumni, 'user_id'>;
@@ -142,8 +143,9 @@ class RelationalDatabaseService {
     const newUserId = users.length > 0 ? Math.max(...users.map((u) => u.user_id)) + 1 : 1;
     const now = new Date().toISOString().replace('T', ' ').substring(0, 19);
 
+    const { password: _password, ...profileData } = userData;
     const newUser: User = {
-      ...userData,
+      ...profileData,
       user_id: newUserId,
       joined_at: now,
     };

@@ -1,3 +1,5 @@
+import { MediaThumbnail } from '../components/common/MediaThumbnail';
+import { DataError } from '../components/common/DataError';
 import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
@@ -39,6 +41,7 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({ onOpenMediaLightbox })
   const [spots, setSpots] = useState<CampusSpot[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -54,7 +57,7 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({ onOpenMediaLightbox })
         setSpots(st);
         setUsers(us);
       } catch (e) {
-        console.error(e);
+        setLoadError(e instanceof Error ? e.message : 'Could not load data');
       } finally {
         setLoading(false);
       }
@@ -70,7 +73,7 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({ onOpenMediaLightbox })
         if (searchQuery.trim()) {
           const q = searchQuery.toLowerCase();
           const matchesTitle = s.title.toLowerCase().includes(q);
-          const matchesDesc = s.description.toLowerCase().includes(q);
+          const matchesDesc = (s.description || '').toLowerCase().includes(q);
           if (!matchesTitle && !matchesDesc) return false;
         }
 
@@ -111,7 +114,7 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({ onOpenMediaLightbox })
       .filter((m) => {
         if (searchQuery.trim()) {
           const q = searchQuery.toLowerCase();
-          if (!m.caption.toLowerCase().includes(q)) return false;
+          if (!(m.caption || '').toLowerCase().includes(q)) return false;
         }
 
         const space = spaces.find((s) => s.space_id === m.space_id);
@@ -132,9 +135,10 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({ onOpenMediaLightbox })
       .sort((a, b) => {
         if (sortBy === 'newest') {
           return new Date(b.uploaded_at).getTime() - new Date(a.uploaded_at).getTime();
-        } else {
+        } else if (sortBy === 'oldest') {
           return new Date(a.uploaded_at).getTime() - new Date(b.uploaded_at).getTime();
         }
+        return (b.reaction_count || 0) - (a.reaction_count || 0);
       });
   }, [mediaList, spaces, searchQuery, selectedSpotId, selectedType, selectedCreatorId, sortBy]);
 
@@ -156,6 +160,7 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({ onOpenMediaLightbox })
 
   return (
     <div className="space-y-6 pb-16">
+      <DataError message={loadError} />
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -338,11 +343,7 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({ onOpenMediaLightbox })
                 onClick={() => onOpenMediaLightbox(m)}
                 className="group relative aspect-square rounded-2xl overflow-hidden bg-slate-950 cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300"
               >
-                <ImageWithFallback
-                  src={m.media_url}
-                  alt={m.caption}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
+                <MediaThumbnail media={m} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
 
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-3 flex flex-col justify-end">
                   <p className="text-xs font-medium text-white line-clamp-2">{m.caption}</p>

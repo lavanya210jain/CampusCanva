@@ -1,3 +1,5 @@
+import { MediaThumbnail } from '../components/common/MediaThumbnail';
+import { DataError } from '../components/common/DataError';
 import React, { useState, useEffect } from 'react';
 import {
   User as UserIcon,
@@ -34,6 +36,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onOpenMediaLightbox })
   const [mySpaces, setMySpaces] = useState<MemorySpace[]>([]);
   const [myMedia, setMyMedia] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
 
   // Edit Modal State
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -53,7 +56,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onOpenMediaLightbox })
         setMySpaces(allSpaces.filter((s) => s.creator_id === currentUser.user_id));
         setMyMedia(allMedia.filter((m) => m.uploader_id === currentUser.user_id));
       } catch (e) {
-        console.error(e);
+        setLoadError(e instanceof Error ? e.message : 'Could not load data');
       } finally {
         setLoading(false);
       }
@@ -77,17 +80,18 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onOpenMediaLightbox })
       showToast('Name cannot be empty', 'error');
       return;
     }
-    await updateProfile({
+    try { await updateProfile({
       full_name: editName.trim(),
       bio: editBio.trim(),
       phone: editPhone.trim(),
       avatar_url: editAvatar.trim(),
     });
-    setIsEditOpen(false);
+    setIsEditOpen(false); } catch { /* AuthContext displays the API error; keep the form open. */ }
   };
 
   return (
     <div className="space-y-8 pb-20">
+      <DataError message={loadError} />
       {/* Profile Header Banner */}
       <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-xs">
         <div className="h-36 sm:h-48 bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-700 relative">
@@ -262,7 +266,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onOpenMediaLightbox })
                 onClick={() => onOpenMediaLightbox(m)}
                 className="group relative aspect-square rounded-2xl overflow-hidden bg-slate-950 cursor-pointer shadow-xs hover:shadow-xl transition-all"
               >
-                <ImageWithFallback src={m.media_url} alt={m.caption} className="w-full h-full object-cover" />
+                <MediaThumbnail media={m} className="w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-3 flex flex-col justify-end">
                   <p className="text-xs text-white line-clamp-1">{m.caption}</p>
                 </div>

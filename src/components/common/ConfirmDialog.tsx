@@ -1,3 +1,4 @@
+import { useDialog } from '../../hooks/useDialog';
 import React from 'react';
 import { AlertTriangle, X } from 'lucide-react';
 
@@ -22,10 +23,11 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   onConfirm,
   onCancel,
 }) => {
+  const dialogRef = useDialog(isOpen, onCancel);
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-fade-in">
+    <div ref={dialogRef} role="dialog" aria-modal="true" aria-label={title} className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-fade-in">
       <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
@@ -34,7 +36,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
             </div>
             <h3 className="text-lg font-semibold text-slate-900">{title}</h3>
           </div>
-          <button onClick={onCancel} className="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+          <button aria-label="Close dialog" onClick={onCancel} className="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
             <X className="w-5 h-5" />
           </button>
         </div>

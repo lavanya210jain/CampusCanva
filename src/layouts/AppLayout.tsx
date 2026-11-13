@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { Outlet, useNavigate, Navigate, NavLink } from 'react-router-dom';
 import { Navbar } from '../components/navigation/Navbar';
 import { Sidebar } from '../components/navigation/Sidebar';
 import { CreateSpaceModal } from '../components/modals/CreateSpaceModal';
@@ -11,9 +11,9 @@ import { useAuth } from '../context/AuthContext';
 import { CampusSpot, MemorySpace, MediaItem } from '../types';
 
 export const AppLayout: React.FC = () => {
-  const { currentUser, isAuthenticated } = useAuth();
+  const { currentUser, isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
+  const [revision, setRevision] = useState(0);
 
   const [spots, setSpots] = useState<CampusSpot[]>([]);
   const [spaces, setSpaces] = useState<MemorySpace[]>([]);
@@ -53,6 +53,9 @@ export const AppLayout: React.FC = () => {
     setActiveLightboxMedia(media);
   };
 
+  if (isLoading) return <div className="p-10 text-center">Connecting to CampusCanva…</div>;
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
       {/* Top Navbar */}
@@ -61,13 +64,17 @@ export const AppLayout: React.FC = () => {
         unreadCount={unreadNotifCount}
       />
 
+      <nav aria-label="Mobile navigation" className="md:hidden flex gap-2 overflow-x-auto bg-white border-b p-3 text-xs whitespace-nowrap">
+        {[['/dashboard','Dashboard'],['/explore','Explore'],['/my-spaces','My Spaces'],['/spots','Spots'],['/time-capsules','Capsules'],['/database-lab','Database Lab']].map(([path,label])=><NavLink key={path} to={path} className={({isActive})=>`px-3 py-2 rounded-lg ${isActive?'bg-indigo-100 text-indigo-800':'text-slate-600'}`}>{label}</NavLink>)}
+      </nav>
       <div className="flex-1 flex max-w-7xl w-full mx-auto">
         {/* Left Desktop Sidebar */}
         <Sidebar unreadCount={unreadNotifCount} />
 
         {/* Main Routed Content Area */}
-        <main className="flex-1 px-4 sm:px-6 lg:px-8 py-6 max-w-full overflow-x-hidden">
+        <main className="flex-1 min-w-0 px-4 sm:px-6 lg:px-8 py-6 max-w-full overflow-x-hidden">
           <Outlet
+            key={`${currentUser?.user_id}-${revision}`}
             context={{
               onOpenCreateModal: () => setIsCreateSpaceOpen(true),
               onOpenAddMemory: handleOpenAddMemory,
@@ -97,15 +104,17 @@ export const AppLayout: React.FC = () => {
         preselectedSpaceId={targetSpaceIdForMemory}
         onMemoryAdded={() => {
           refreshData();
-          window.dispatchEvent(new Event('memory_added'));
+          setRevision(value => value + 1);
         }}
       />
 
       <MediaLightboxModal
         media={activeLightboxMedia}
         onClose={() => setActiveLightboxMedia(null)}
-        onDeleteMedia={(mediaId) => {
-          refreshData();
+        onDeleteMedia={async (mediaId) => {
+          await api.deleteMediaItem(mediaId);
+          await refreshData();
+          setRevision(value => value + 1);
           setActiveLightboxMedia(null);
         }}
       />

@@ -10,6 +10,8 @@ CREATE DATABASE IF NOT EXISTS campuscanva_db CHARACTER SET utf8mb4 COLLATE utf8m
 USE campuscanva_db;
 
 -- Drop tables in reverse order of foreign key dependencies
+DROP TABLE IF EXISTS app_session;
+DROP TABLE IF EXISTS notification;
 DROP TABLE IF EXISTS comment;
 DROP TABLE IF EXISTS reaction;
 DROP TABLE IF EXISTS media_tag;
@@ -90,7 +92,7 @@ CREATE TABLE memory_space (
     description TEXT NULL,
     space_type ENUM('Event', 'Batch', 'Club', 'Trip', 'General') NOT NULL,
     cover_url VARCHAR(2048) NULL,
-    is_time_locked BOOLEAN DEFAULT FALSE,
+    is_time_locked BOOLEAN NOT NULL DEFAULT FALSE,
     unlock_date DATETIME NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -108,7 +110,8 @@ CREATE TABLE memory_space (
 CREATE TABLE space_member (
     space_id INT NOT NULL,
     user_id INT NOT NULL,
-    role_type ENUM('Admin', 'Contributor', 'Viewer') DEFAULT 'Contributor',
+    role_type ENUM('Admin', 'Contributor', 'Viewer') NOT NULL DEFAULT 'Contributor',
+    INDEX idx_member_user (user_id, space_id),
     joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (space_id, user_id),
     FOREIGN KEY (space_id) REFERENCES memory_space(space_id) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -126,6 +129,8 @@ CREATE TABLE media_item (
     media_type ENUM('PHOTO', 'VIDEO') NOT NULL,
     caption TEXT NULL,
     uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    next_comment_no INT NOT NULL DEFAULT 1,
+    INDEX idx_media_space_date (space_id, uploaded_at),
     FOREIGN KEY (space_id) REFERENCES memory_space(space_id) ON DELETE CASCADE ON UPDATE CASCADE,
     FOREIGN KEY (uploader_id) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
@@ -135,14 +140,14 @@ CREATE TABLE media_item (
 -- ---------------------------------------------------------------------
 CREATE TABLE photo (
     media_id INT PRIMARY KEY,
-    width INT NULL,
-    height INT NULL,
+    width INT NULL CHECK (width > 0),
+    height INT NULL CHECK (height > 0),
     FOREIGN KEY (media_id) REFERENCES media_item(media_id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
 CREATE TABLE video (
     media_id INT PRIMARY KEY,
-    duration_seconds INT NULL,
+    duration_seconds DECIMAL(10,3) NULL CHECK (duration_seconds >= 0),
     FOREIGN KEY (media_id) REFERENCES media_item(media_id) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
@@ -197,11 +202,11 @@ CREATE TRIGGER trg_before_insert_comment
 BEFORE INSERT ON comment
 FOR EACH ROW
 BEGIN
-    DECLARE next_no INT;
-    SELECT COALESCE(MAX(comment_no), 0) + 1 INTO next_no
-    FROM comment
+    -- Updating the parent acquires an exclusive row lock until commit.
+    -- The counter never reuses a deleted comment's partial key.
+    UPDATE media_item SET next_comment_no = next_comment_no + 1
     WHERE media_id = NEW.media_id;
-    SET NEW.comment_no = next_no;
+    SET NEW.comment_no = (SELECT next_comment_no - 1 FROM media_item WHERE media_id = NEW.media_id);
 END //
 DELIMITER ;
 
@@ -239,4 +244,124 @@ JOIN users u ON ms.creator_id = u.user_id
 LEFT JOIN campus_spot cs ON ms.spot_id = cs.spot_id
 LEFT JOIN media_item mi ON ms.space_id = mi.space_id
 LEFT JOIN space_member sm ON ms.space_id = sm.space_id
-GROUP BY ms.space_id;
+GROUP BY ms.space_id, ms.title, ms.space_type, cs.spot_name, u.full_name, ms.is_time_locked, ms.unlock_date;
+
+
+-- Persistent notifications and opaque, expiring HTTP sessions.
+CREATE TABLE notification (
+    notification_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    sender_id INT NOT NULL,
+    title VARCHAR(150) NOT NULL,
+    message TEXT NOT NULL,
+    type ENUM('reaction','comment','member','capsule','tag') NOT NULL,
+    target_url VARCHAR(255),
+    is_read BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_notification_inbox (user_id, is_read, created_at),
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (sender_id) REFERENCES users(user_id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+CREATE TABLE app_session (
+    token_hash CHAR(64) PRIMARY KEY,
+    user_id INT NOT NULL,
+    expires_at DATETIME NOT NULL,
+    INDEX idx_session_expiry (expires_at),
+    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE OR REPLACE VIEW vw_user_contributions AS
+SELECT u.user_id, u.full_name, u.user_type,
+       COUNT(DISTINCT ms.space_id) AS spaces_created,
+       COUNT(DISTINCT mi.media_id) AS memories_uploaded
+FROM users u
+LEFT JOIN memory_space ms ON ms.creator_id=u.user_id
+LEFT JOIN media_item mi ON mi.uploader_id=u.user_id
+GROUP BY u.user_id,u.full_name,u.user_type;
+
+DELIMITER //
+CREATE TRIGGER trg_student_insert BEFORE INSERT ON student
+FOR EACH ROW
+BEGIN
+    IF (SELECT user_type FROM users WHERE user_id=NEW.user_id) <> 'STUDENT' THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='User subtype must match users.user_type';
+    END IF;
+END //
+CREATE TRIGGER trg_student_update BEFORE UPDATE ON student
+FOR EACH ROW
+BEGIN
+    IF (SELECT user_type FROM users WHERE user_id=NEW.user_id) <> 'STUDENT' THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='User subtype must match users.user_type';
+    END IF;
+END //
+CREATE TRIGGER trg_alumni_insert BEFORE INSERT ON alumni
+FOR EACH ROW
+BEGIN
+    IF (SELECT user_type FROM users WHERE user_id=NEW.user_id) <> 'ALUMNI' THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='User subtype must match users.user_type';
+    END IF;
+END //
+CREATE TRIGGER trg_alumni_update BEFORE UPDATE ON alumni
+FOR EACH ROW
+BEGIN
+    IF (SELECT user_type FROM users WHERE user_id=NEW.user_id) <> 'ALUMNI' THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='User subtype must match users.user_type';
+    END IF;
+END //
+CREATE TRIGGER trg_faculty_insert BEFORE INSERT ON faculty
+FOR EACH ROW
+BEGIN
+    IF (SELECT user_type FROM users WHERE user_id=NEW.user_id) <> 'FACULTY' THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='User subtype must match users.user_type';
+    END IF;
+END //
+CREATE TRIGGER trg_faculty_update BEFORE UPDATE ON faculty
+FOR EACH ROW
+BEGIN
+    IF (SELECT user_type FROM users WHERE user_id=NEW.user_id) <> 'FACULTY' THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='User subtype must match users.user_type';
+    END IF;
+END //
+CREATE TRIGGER trg_photo_insert BEFORE INSERT ON photo
+FOR EACH ROW
+BEGIN
+    IF (SELECT media_type FROM media_item WHERE media_id=NEW.media_id) <> 'PHOTO' THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Media subtype must match media_item.media_type';
+    END IF;
+END //
+CREATE TRIGGER trg_photo_update BEFORE UPDATE ON photo
+FOR EACH ROW
+BEGIN
+    IF (SELECT media_type FROM media_item WHERE media_id=NEW.media_id) <> 'PHOTO' THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Media subtype must match media_item.media_type';
+    END IF;
+END //
+CREATE TRIGGER trg_video_insert BEFORE INSERT ON video
+FOR EACH ROW
+BEGIN
+    IF (SELECT media_type FROM media_item WHERE media_id=NEW.media_id) <> 'VIDEO' THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Media subtype must match media_item.media_type';
+    END IF;
+END //
+CREATE TRIGGER trg_video_update BEFORE UPDATE ON video
+FOR EACH ROW
+BEGIN
+    IF (SELECT media_type FROM media_item WHERE media_id=NEW.media_id) <> 'VIDEO' THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Media subtype must match media_item.media_type';
+    END IF;
+END //
+CREATE TRIGGER trg_user_type_immutable BEFORE UPDATE ON users
+FOR EACH ROW
+BEGIN
+    IF NEW.user_type <> OLD.user_type THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='User type is immutable; create a new account';
+    END IF;
+END //
+CREATE TRIGGER trg_media_type_immutable BEFORE UPDATE ON media_item
+FOR EACH ROW
+BEGIN
+    IF NEW.media_type <> OLD.media_type THEN
+        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT='Media type is immutable';
+    END IF;
+END //
+DELIMITER ;

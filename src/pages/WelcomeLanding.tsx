@@ -1,3 +1,4 @@
+import { DatabaseStatus } from '../components/common/DatabaseStatus';
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
@@ -20,7 +21,7 @@ export const WelcomeLanding: React.FC = () => {
   const navigate = useNavigate();
 
   const handleQuickDemo = async (userId: number, roleName: string) => {
-    await switchUser(userId);
+    try { await switchUser(userId); } catch { return; }
     showToast(`Logged in as ${roleName} for live evaluation demo`, 'success');
     navigate('/dashboard');
   };
@@ -59,6 +60,7 @@ export const WelcomeLanding: React.FC = () => {
         </div>
       </header>
 
+      <div className="max-w-7xl w-full mx-auto px-4"><DatabaseStatus /></div>
       {/* Main Hero Section */}
       <main className="flex-1">
         <section className="relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-28">

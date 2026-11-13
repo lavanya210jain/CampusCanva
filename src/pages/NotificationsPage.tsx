@@ -1,3 +1,4 @@
+import { DataError } from '../components/common/DataError';
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
@@ -25,6 +26,7 @@ export const NotificationsPage: React.FC<NotificationsPageProps> = ({ onRefreshN
   const { showToast } = useToast();
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
 
   const fetchNotifs = async () => {
     if (!currentUser) return;
@@ -77,6 +79,7 @@ export const NotificationsPage: React.FC<NotificationsPageProps> = ({ onRefreshN
 
   return (
     <div className="space-y-6 pb-20 max-w-4xl mx-auto">
+      <DataError message={loadError} />
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
         <div>

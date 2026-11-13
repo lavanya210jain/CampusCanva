@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { MediaThumbnail } from "../components/common/MediaThumbnail";
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import {
   MapPin,
   Calendar,
@@ -17,11 +18,11 @@ import {
   Play,
   LogOut,
   UserPlus,
-} from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
-import { useToast } from '../context/ToastContext';
-import { useDemo } from '../context/DemoContext';
-import { api } from '../services/api';
+} from "lucide-react";
+import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
+import { useDemo } from "../context/DemoContext";
+import { api } from "../services/api";
 import {
   MemorySpace,
   MediaItem,
@@ -29,9 +30,9 @@ import {
   CampusSpot,
   FullUserProfile,
   MemberRole,
-} from '../types';
-import { ImageWithFallback } from '../components/common/ImageWithFallback';
-import { ConfirmDialog } from '../components/common/ConfirmDialog';
+} from "../types";
+import { ImageWithFallback } from "../components/common/ImageWithFallback";
+import { ConfirmDialog } from "../components/common/ConfirmDialog";
 
 interface SpaceDetailPageProps {
   onOpenAddMemory: (spaceId: number) => void;
@@ -54,20 +55,37 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
   const [creator, setCreator] = useState<FullUserProfile | null>(null);
   const [spot, setSpot] = useState<CampusSpot | null>(null);
   const [mediaList, setMediaList] = useState<MediaItem[]>([]);
-  const [members, setMembers] = useState<(SpaceMember & { user: FullUserProfile })[]>([]);
-  const [activeTab, setActiveTab] = useState<'memories' | 'members' | 'about'>('memories');
+  const [members, setMembers] = useState<
+    (SpaceMember & { user: FullUserProfile })[]
+  >([]);
+  const [activeTab, setActiveTab] = useState<"memories" | "members" | "about">(
+    "memories",
+  );
   const [loading, setLoading] = useState(true);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [newMemberId, setNewMemberId] = useState("");
+  const [memberRole, setMemberRole] = useState<MemberRole>("Contributor");
+  const [editing, setEditing] = useState(false);
+  const [editTitle, setEditTitle] = useState("");
+  const [editDescription, setEditDescription] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [loadError, setLoadError] = useState("");
 
   // Time capsule ticker
-  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0, isPast: false });
+  const [timeLeft, setTimeLeft] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+    isPast: false,
+  });
 
   const loadData = async () => {
     try {
       const sp = await api.getMemorySpaceById(spaceId);
       if (!sp) {
-        showToast('Memory Space not found', 'error');
-        navigate('/explore');
+        showToast("Memory Space not found", "error");
+        navigate("/explore");
         return;
       }
       setSpace(sp);
@@ -84,7 +102,7 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
       setMediaList(m);
       setMembers(mem);
     } catch (e) {
-      console.error(e);
+      setLoadError(e instanceof Error ? e.message : "Could not load space");
     } finally {
       setLoading(false);
     }
@@ -92,7 +110,7 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
 
   useEffect(() => {
     if (spaceId) loadData();
-  }, [spaceId]);
+  }, [spaceId, currentUser?.user_id]);
 
   // Live countdown calculation for Time Capsule
   useEffect(() => {
@@ -101,10 +119,18 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
     const tick = () => {
       const diff = new Date(space.unlock_date!).getTime() - Date.now();
       if (diff <= 0) {
-        setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0, isPast: true });
+        setTimeLeft({
+          days: 0,
+          hours: 0,
+          minutes: 0,
+          seconds: 0,
+          isPast: true,
+        });
       } else {
         const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const hours = Math.floor(
+          (diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60),
+        );
         const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((diff % (1000 * 60)) / 1000);
         setTimeLeft({ days, hours, minutes, seconds, isPast: false });
@@ -116,6 +142,15 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
     return () => clearInterval(timer);
   }, [space?.unlock_date]);
 
+  if (loadError)
+    return (
+      <div role="alert" className="p-6 text-rose-700">
+        {loadError}{" "}
+        <button className="underline" onClick={() => window.location.reload()}>
+          Retry
+        </button>
+      </div>
+    );
   if (loading || !space) {
     return (
       <div className="py-20 text-center">
@@ -126,24 +161,32 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
   }
 
   // Determine current user membership & role
-  const userMembership = members.find((m) => m.user_id === currentUser?.user_id);
-  const userRole: MemberRole | null = userMembership ? userMembership.role_type : null;
-  const isAdmin = userRole === 'Admin' || currentUser?.user_id === space.creator_id;
-  const isContributor = isAdmin || userRole === 'Contributor';
+  const userMembership = members.find(
+    (m) => m.user_id === currentUser?.user_id,
+  );
+  const userRole: MemberRole | null = userMembership
+    ? userMembership.role_type
+    : null;
+  const isAdmin =
+    userRole === "Admin" || currentUser?.user_id === space.creator_id;
+  const isContributor = isAdmin || userRole === "Contributor";
   const isLocked = space.is_time_locked && !timeLeft.isPast;
 
   // Actions
-  const handleJoinSpace = async (role: MemberRole = 'Contributor') => {
+  const handleJoinSpace = async (role: MemberRole = "Contributor") => {
     if (!currentUser) {
-      showToast('Please sign in to join this space', 'error');
+      showToast("Please sign in to join this space", "error");
       return;
     }
     try {
       await api.addSpaceMember(spaceId, currentUser.user_id, role);
-      showToast(`Joined space as ${role}!`, 'success');
+      showToast(`Joined space as ${role}!`, "success");
       loadData();
     } catch (e) {
-      showToast('Could not join space', 'error');
+      showToast(
+        e instanceof Error ? e.message : "Could not join space",
+        "error",
+      );
     }
   };
 
@@ -151,20 +194,23 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
     if (!currentUser) return;
     try {
       await api.removeSpaceMember(spaceId, currentUser.user_id);
-      showToast('Left memory space', 'info');
+      showToast("Left memory space", "info");
       loadData();
     } catch (e) {
-      showToast('Could not leave space', 'error');
+      showToast("Could not leave space", "error");
     }
   };
 
   const handleDeleteSpace = async () => {
     try {
       await api.deleteMemorySpace(spaceId);
-      showToast('Memory Space deleted', 'info');
-      navigate('/dashboard');
+      showToast("Memory Space deleted", "info");
+      navigate("/dashboard");
     } catch (e) {
-      showToast('Failed to delete space', 'error');
+      showToast(
+        e instanceof Error ? e.message : "Failed to delete space",
+        "error",
+      );
     }
   };
 
@@ -182,7 +228,7 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
 
         {isDemoMode && (
           <button
-            onClick={() => openInspector('space', space.space_id)}
+            onClick={() => openInspector("space", space.space_id)}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold transition hover:bg-indigo-100"
           >
             <Database className="w-3.5 h-3.5" />
@@ -198,9 +244,9 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
           <ImageWithFallback
             src={space.cover_url}
             alt={space.title}
-            className={`w-full h-full object-cover ${isLocked ? 'filter blur-xs brightness-75' : ''}`}
+            className={`w-full h-full object-cover ${isLocked ? "filter blur-xs brightness-75" : ""}`}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/30 to-transparent"></div>
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/30 to-transparent"></div>
 
           {/* Badges Overlay */}
           <div className="absolute top-4 left-4 flex flex-wrap items-center gap-2">
@@ -211,11 +257,15 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
             {space.is_time_locked && (
               <span
                 className={`px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider text-white flex items-center gap-1.5 shadow-md ${
-                  isLocked ? 'bg-amber-500' : 'bg-emerald-500'
+                  isLocked ? "bg-amber-500" : "bg-emerald-500"
                 }`}
               >
-                {isLocked ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
-                <span>{isLocked ? 'Time-Locked' : 'Unlocked Vault'}</span>
+                {isLocked ? (
+                  <Lock className="w-3.5 h-3.5" />
+                ) : (
+                  <Unlock className="w-3.5 h-3.5" />
+                )}
+                <span>{isLocked ? "Time-Locked" : "Unlocked Vault"}</span>
               </span>
             )}
           </div>
@@ -234,7 +284,9 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
               )}
               <span className="flex items-center gap-1.5">
                 <Calendar className="w-4 h-4 text-slate-300" />
-                <span>Created {new Date(space.created_at).toLocaleDateString()}</span>
+                <span>
+                  Created {new Date(space.created_at).toLocaleDateString()}
+                </span>
               </span>
               <span className="flex items-center gap-1.5">
                 <Users className="w-4 h-4 text-slate-300" />
@@ -249,12 +301,16 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
           <div className="flex items-center gap-3">
             <ImageWithFallback
               src={creator?.avatar_url}
-              alt={creator?.full_name || 'Creator'}
+              alt={creator?.full_name || "Creator"}
               className="w-11 h-11 rounded-full ring-2 ring-indigo-100"
             />
             <div>
-              <div className="text-xs text-slate-400 font-medium">Space Creator</div>
-              <div className="text-sm font-bold text-slate-900">{creator?.full_name}</div>
+              <div className="text-xs text-slate-400 font-medium">
+                Space Creator
+              </div>
+              <div className="text-sm font-bold text-slate-900">
+                {creator?.full_name}
+              </div>
             </div>
 
             {userRole && (
@@ -267,7 +323,7 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
           <div className="flex flex-wrap items-center gap-2">
             {!userMembership ? (
               <button
-                onClick={() => handleJoinSpace('Contributor')}
+                onClick={() => handleJoinSpace("Contributor")}
                 className="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-xs transition"
               >
                 <UserPlus className="w-4 h-4" />
@@ -285,7 +341,7 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
               )
             )}
 
-            {isContributor && (!isLocked || isAdmin) && (
+            {isContributor && (
               <button
                 onClick={() => onOpenAddMemory(space.space_id)}
                 className="flex items-center gap-1.5 px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl text-xs font-bold transition border border-indigo-200"
@@ -310,11 +366,11 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
         {/* Tab Navigation */}
         <div className="px-6 flex items-center gap-8 border-b border-slate-100 text-xs font-bold uppercase tracking-wider">
           <button
-            onClick={() => setActiveTab('memories')}
+            onClick={() => setActiveTab("memories")}
             className={`py-3.5 border-b-2 transition flex items-center gap-2 ${
-              activeTab === 'memories'
-                ? 'border-indigo-600 text-indigo-600'
-                : 'border-transparent text-slate-400 hover:text-slate-700'
+              activeTab === "memories"
+                ? "border-indigo-600 text-indigo-600"
+                : "border-transparent text-slate-400 hover:text-slate-700"
             }`}
           >
             <ImageIcon className="w-4 h-4" />
@@ -322,11 +378,11 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
           </button>
 
           <button
-            onClick={() => setActiveTab('members')}
+            onClick={() => setActiveTab("members")}
             className={`py-3.5 border-b-2 transition flex items-center gap-2 ${
-              activeTab === 'members'
-                ? 'border-indigo-600 text-indigo-600'
-                : 'border-transparent text-slate-400 hover:text-slate-700'
+              activeTab === "members"
+                ? "border-indigo-600 text-indigo-600"
+                : "border-transparent text-slate-400 hover:text-slate-700"
             }`}
           >
             <Users className="w-4 h-4" />
@@ -334,11 +390,11 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
           </button>
 
           <button
-            onClick={() => setActiveTab('about')}
+            onClick={() => setActiveTab("about")}
             className={`py-3.5 border-b-2 transition flex items-center gap-2 ${
-              activeTab === 'about'
-                ? 'border-indigo-600 text-indigo-600'
-                : 'border-transparent text-slate-400 hover:text-slate-700'
+              activeTab === "about"
+                ? "border-indigo-600 text-indigo-600"
+                : "border-transparent text-slate-400 hover:text-slate-700"
             }`}
           >
             <Shield className="w-4 h-4" />
@@ -348,7 +404,7 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
       </div>
 
       {/* Tab Content */}
-      {activeTab === 'memories' && (
+      {activeTab === "memories" && (
         <div>
           {isLocked ? (
             /* Time Locked Vault Screen */
@@ -360,33 +416,44 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
                 "This memory is waiting for its moment."
               </h2>
               <p className="text-xs text-slate-500 mt-2 max-w-md mx-auto leading-relaxed">
-                This memory space is locked as a future time capsule. All photos, clips, and messages
-                will automatically unlock and reveal themselves when the countdown hits zero.
+                This memory space is locked as a future time capsule. All
+                photos, clips, and messages will automatically unlock and reveal
+                themselves when the countdown hits zero.
               </p>
 
               {/* Countdown Clock */}
               <div className="mt-8 grid grid-cols-4 gap-3 max-w-sm mx-auto">
                 <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200">
-                  <div className="text-2xl font-black text-slate-900 font-mono">{timeLeft.days}</div>
-                  <div className="text-[10px] text-slate-400 uppercase font-bold mt-1">Days</div>
+                  <div className="text-2xl font-black text-slate-900 font-mono">
+                    {timeLeft.days}
+                  </div>
+                  <div className="text-[10px] text-slate-400 uppercase font-bold mt-1">
+                    Days
+                  </div>
                 </div>
                 <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200">
                   <div className="text-2xl font-black text-slate-900 font-mono">
-                    {String(timeLeft.hours).padStart(2, '0')}
+                    {String(timeLeft.hours).padStart(2, "0")}
                   </div>
-                  <div className="text-[10px] text-slate-400 uppercase font-bold mt-1">Hours</div>
+                  <div className="text-[10px] text-slate-400 uppercase font-bold mt-1">
+                    Hours
+                  </div>
                 </div>
                 <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200">
                   <div className="text-2xl font-black text-slate-900 font-mono">
-                    {String(timeLeft.minutes).padStart(2, '0')}
+                    {String(timeLeft.minutes).padStart(2, "0")}
                   </div>
-                  <div className="text-[10px] text-slate-400 uppercase font-bold mt-1">Mins</div>
+                  <div className="text-[10px] text-slate-400 uppercase font-bold mt-1">
+                    Mins
+                  </div>
                 </div>
                 <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200">
                   <div className="text-2xl font-black text-amber-600 font-mono">
-                    {String(timeLeft.seconds).padStart(2, '0')}
+                    {String(timeLeft.seconds).padStart(2, "0")}
                   </div>
-                  <div className="text-[10px] text-slate-400 uppercase font-bold mt-1">Secs</div>
+                  <div className="text-[10px] text-slate-400 uppercase font-bold mt-1">
+                    Secs
+                  </div>
                 </div>
               </div>
 
@@ -399,7 +466,9 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
               <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto mb-3">
                 <ImageIcon className="w-6 h-6" />
               </div>
-              <h3 className="font-bold text-slate-900 text-base">No memories uploaded yet</h3>
+              <h3 className="font-bold text-slate-900 text-base">
+                No memories uploaded yet
+              </h3>
               <p className="text-xs text-slate-500 mt-1">
                 Be the first to add a photograph or video to this space!
               </p>
@@ -417,23 +486,37 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
               {mediaList.map((m) => (
                 <div
                   key={m.media_id}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={`Open memory: ${m.caption || m.media_type}`}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      onOpenMediaLightbox(m);
+                    }
+                  }}
                   onClick={() => onOpenMediaLightbox(m)}
                   className="group relative aspect-square rounded-2xl overflow-hidden bg-slate-950 cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300"
                 >
-                  <ImageWithFallback
-                    src={m.media_url}
-                    alt={m.caption}
+                  <MediaThumbnail
+                    media={m}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-3 flex flex-col justify-end">
-                    <p className="text-xs font-medium text-white line-clamp-2">{m.caption}</p>
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-3 flex flex-col justify-end">
+                    <p className="text-xs font-medium text-white line-clamp-2">
+                      {m.caption}
+                    </p>
                     <div className="flex items-center justify-between mt-2 text-[10px] text-slate-300">
-                      <span className="uppercase font-bold text-indigo-300">{m.media_type}</span>
-                      <span>{new Date(m.uploaded_at).toLocaleDateString()}</span>
+                      <span className="uppercase font-bold text-indigo-300">
+                        {m.media_type}
+                      </span>
+                      <span>
+                        {new Date(m.uploaded_at).toLocaleDateString()}
+                      </span>
                     </div>
                   </div>
 
-                  {m.media_type === 'VIDEO' && (
+                  {m.media_type === "VIDEO" && (
                     <div className="absolute top-2 right-2 w-7 h-7 rounded-full bg-slate-900/70 text-white flex items-center justify-center backdrop-blur-xs">
                       <Play className="w-3.5 h-3.5 ml-0.5 fill-white" />
                     </div>
@@ -446,15 +529,81 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
       )}
 
       {/* Tab: Members */}
-      {activeTab === 'members' && (
+      {activeTab === "members" && (
         <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-xs">
           <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
             <div>
-              <h3 className="text-base font-bold text-slate-900">Space Community & Roles</h3>
-              <p className="text-xs text-slate-500">M:N Relation resolved via space_member</p>
+              <h3 className="text-base font-bold text-slate-900">
+                Space Community & Roles
+              </h3>
+              <p className="text-xs text-slate-500">
+                M:N Relation resolved via space_member
+              </p>
             </div>
           </div>
 
+          {isAdmin && (
+            <form
+              className="flex flex-wrap gap-2 mb-5"
+              onSubmit={async (e) => {
+                e.preventDefault();
+                if (!newMemberId) return;
+                setSaving(true);
+                try {
+                  await api.addSpaceMember(
+                    spaceId,
+                    Number(newMemberId),
+                    memberRole,
+                  );
+                  await loadData();
+                  setNewMemberId("");
+                  showToast("Member added", "success");
+                } catch (error) {
+                  showToast(
+                    error instanceof Error
+                      ? error.message
+                      : "Could not add member",
+                    "error",
+                  );
+                } finally {
+                  setSaving(false);
+                }
+              }}
+            >
+              <select
+                aria-label="Add member"
+                required
+                value={newMemberId}
+                onChange={(e) => setNewMemberId(e.target.value)}
+                className="border rounded-xl p-2 text-sm max-w-full"
+              >
+                <option value="">Choose a campus member</option>
+                {allUsers
+                  .filter((u) => !members.some((m) => m.user_id === u.user_id))
+                  .map((u) => (
+                    <option key={u.user_id} value={u.user_id}>
+                      {u.full_name}
+                    </option>
+                  ))}
+              </select>
+              <select
+                aria-label="New member role"
+                value={memberRole}
+                onChange={(e) => setMemberRole(e.target.value as MemberRole)}
+                className="border rounded-xl p-2 text-sm"
+              >
+                {["Contributor", "Viewer", "Admin"].map((r) => (
+                  <option key={r}>{r}</option>
+                ))}
+              </select>
+              <button
+                disabled={saving || !newMemberId}
+                className="rounded-xl bg-indigo-600 text-white p-2 text-sm disabled:opacity-50"
+              >
+                Add member
+              </button>
+            </form>
+          )}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {members.map((m) => (
               <div
@@ -468,24 +617,90 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
                     className="w-10 h-10 rounded-full shrink-0"
                   />
                   <div>
-                    <div className="text-xs font-bold text-slate-900">{m.user.full_name}</div>
+                    <div className="text-xs font-bold text-slate-900">
+                      {m.user.full_name}
+                    </div>
                     <div className="text-[10px] text-slate-400 uppercase tracking-wider">
                       {m.user.user_type}
                     </div>
                   </div>
                 </div>
 
-                <span
-                  className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                    m.role_type === 'Admin'
-                      ? 'bg-purple-100 text-purple-700'
-                      : m.role_type === 'Contributor'
-                      ? 'bg-indigo-100 text-indigo-700'
-                      : 'bg-slate-200 text-slate-700'
-                  }`}
-                >
-                  {m.role_type}
-                </span>
+                {isAdmin && m.user_id !== space.creator_id ? (
+                  <div className="flex items-center gap-1">
+                    <select
+                      aria-label={`Role for ${m.user.full_name}`}
+                      value={m.role_type}
+                      disabled={saving}
+                      className="p-1 border rounded-lg text-xs max-w-28"
+                      onChange={async (e) => {
+                        setSaving(true);
+                        try {
+                          await api.addSpaceMember(
+                            spaceId,
+                            m.user_id,
+                            e.target.value as MemberRole,
+                          );
+                          await loadData();
+                        } catch (error) {
+                          showToast(
+                            error instanceof Error
+                              ? error.message
+                              : "Role change failed",
+                            "error",
+                          );
+                        } finally {
+                          setSaving(false);
+                        }
+                      }}
+                    >
+                      {["Admin", "Contributor", "Viewer"].map((r) => (
+                        <option key={r}>{r}</option>
+                      ))}
+                    </select>
+                    <button
+                      title={`Remove ${m.user.full_name}`}
+                      disabled={saving}
+                      className="text-rose-600 p-1"
+                      onClick={async () => {
+                        if (
+                          !confirm(
+                            `Remove ${m.user.full_name} from this space?`,
+                          )
+                        )
+                          return;
+                        setSaving(true);
+                        try {
+                          await api.removeSpaceMember(spaceId, m.user_id);
+                          await loadData();
+                        } catch (error) {
+                          showToast(
+                            error instanceof Error
+                              ? error.message
+                              : "Remove failed",
+                            "error",
+                          );
+                        } finally {
+                          setSaving(false);
+                        }
+                      }}
+                    >
+                      ×
+                    </button>
+                  </div>
+                ) : (
+                  <span
+                    className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                      m.role_type === "Admin"
+                        ? "bg-purple-100 text-purple-700"
+                        : m.role_type === "Contributor"
+                          ? "bg-indigo-100 text-indigo-700"
+                          : "bg-slate-200 text-slate-700"
+                    }`}
+                  >
+                    {m.role_type}
+                  </span>
+                )}
               </div>
             ))}
           </div>
@@ -493,11 +708,74 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
       )}
 
       {/* Tab: About */}
-      {activeTab === 'about' && (
+      {activeTab === "about" && (
         <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-xs space-y-6">
           <div>
-            <h3 className="text-base font-bold text-slate-900 mb-2">About This Memory Space</h3>
-            <p className="text-sm text-slate-600 leading-relaxed">{space.description}</p>
+            <h3 className="text-base font-bold text-slate-900 mb-2">
+              About This Memory Space
+            </h3>
+            <p className="text-sm text-slate-600 leading-relaxed">
+              {space.description}
+            </p>
+            {isAdmin && (
+              <button
+                className="mt-3 text-sm font-semibold text-indigo-600"
+                onClick={() => {
+                  setEditTitle(space.title);
+                  setEditDescription(space.description);
+                  setEditing(!editing);
+                }}
+              >
+                Edit space details
+              </button>
+            )}
+            {isAdmin && editing && (
+              <form
+                className="mt-3 space-y-3"
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  setSaving(true);
+                  try {
+                    await api.updateMemorySpace(spaceId, {
+                      title: editTitle,
+                      description: editDescription,
+                    });
+                    await loadData();
+                    setEditing(false);
+                    showToast("Space updated", "success");
+                  } catch (error) {
+                    showToast(
+                      error instanceof Error ? error.message : "Update failed",
+                      "error",
+                    );
+                  } finally {
+                    setSaving(false);
+                  }
+                }}
+              >
+                <input
+                  aria-label="Space title"
+                  required
+                  maxLength={150}
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                  className="w-full border rounded-xl p-2"
+                />
+                <textarea
+                  aria-label="Space description"
+                  maxLength={5000}
+                  value={editDescription}
+                  onChange={(e) => setEditDescription(e.target.value)}
+                  className="w-full border rounded-xl p-2"
+                />
+                <button
+                  disabled={saving}
+                  className="rounded-xl bg-indigo-600 text-white p-2 text-sm"
+                >
+                  Save changes
+                </button>
+              </form>
+            )}
           </div>
 
           {spot && (
@@ -506,27 +784,43 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
                 <MapPin className="w-4 h-4 text-indigo-600" />
                 <span>Associated Campus Landmark: {spot.spot_name}</span>
               </div>
-              <p className="text-xs text-slate-600 leading-relaxed">{spot.description}</p>
+              <p className="text-xs text-slate-600 leading-relaxed">
+                {spot.description}
+              </p>
             </div>
           )}
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-slate-100 text-xs">
             <div>
-              <span className="text-slate-400 font-semibold block">Primary Key (PK)</span>
-              <span className="font-mono text-slate-800 font-bold">space_id = {space.space_id}</span>
-            </div>
-            <div>
-              <span className="text-slate-400 font-semibold block">Creator Foreign Key</span>
-              <span className="font-mono text-slate-800 font-bold">creator_id = {space.creator_id}</span>
-            </div>
-            <div>
-              <span className="text-slate-400 font-semibold block">Spot Foreign Key</span>
-              <span className="font-mono text-slate-800 font-bold">spot_id = {space.spot_id || 'NULL'}</span>
-            </div>
-            <div>
-              <span className="text-slate-400 font-semibold block">Time Lock Constraint</span>
+              <span className="text-slate-400 font-semibold block">
+                Primary Key (PK)
+              </span>
               <span className="font-mono text-slate-800 font-bold">
-                {space.is_time_locked ? 'TRUE (CHECK chk_timelock)' : 'FALSE'}
+                space_id = {space.space_id}
+              </span>
+            </div>
+            <div>
+              <span className="text-slate-400 font-semibold block">
+                Creator Foreign Key
+              </span>
+              <span className="font-mono text-slate-800 font-bold">
+                creator_id = {space.creator_id}
+              </span>
+            </div>
+            <div>
+              <span className="text-slate-400 font-semibold block">
+                Spot Foreign Key
+              </span>
+              <span className="font-mono text-slate-800 font-bold">
+                spot_id = {space.spot_id || "NULL"}
+              </span>
+            </div>
+            <div>
+              <span className="text-slate-400 font-semibold block">
+                Time Lock Constraint
+              </span>
+              <span className="font-mono text-slate-800 font-bold">
+                {space.is_time_locked ? "TRUE (CHECK chk_timelock)" : "FALSE"}
               </span>
             </div>
           </div>

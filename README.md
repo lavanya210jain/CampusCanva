@@ -1,180 +1,148 @@
-# 🏛️ CampusCanva — A Living Digital Archive of Campus Life
-**DBMS Lab Project | Netaji Subhas University of Technology (NSUT), Delhi**  
-**Faculty Guide:** Prof. Vivek Mehta (Dept. of CSE)  
-**Team Members:**  
-- **Kavya Gupta** (2025UCS1583) — Database Design & Schema Architecture  
-- **Rohan Kumar** (2025UCS1587) — Relational Queries & Media Subsystems  
-- **Ansh Dhillon** (2025UCS1589) — UI/UX Lead & Dashboard Feed  
-- **Lavanya Jain** (2025UCS1610) — Interactive Lightbox, Tagging & Time Capsules  
+# CampusCanva — A Living Digital Archive of Campus Life
 
----
+Semester 3 DBMS project · NSUT Delhi. React + TypeScript + Express + **MySQL**.
 
-## 🎯 Project Overview & Motivation
+Students, faculty and alumni create collaborative memory spaces, upload photos/videos, tag people, react, comment and seal time capsules. The default application reads and writes MySQL through the API. Browser localStorage is used only in the explicitly selected practice fallback.
 
-College life generates a high volume of digital memories across fests (Moksha), hackathons (Innovision), societies (ARES Robotics), trips, and day-to-day hangouts. However, these memories usually remain scattered across WhatsApp groups, Google Drives, and personal camera rolls, losing their **shared context**:
-- *Who was tagged in this memory?*
-- *Which specific campus spot was this taken at (Central Lawn, Admin Block, Nescafe)?*
-- *What was the story or reaction behind the event?*
+## Run on your laptop
 
-**CampusCanva** solves this by establishing structured, collaborative **Memory Spaces** integrated with campus landmark context, role-based memberships (`Admin`, `Contributor`, `Viewer`), social interactions (weak-entity comments, reactions), and **Time Capsules** (time-locked vaults that automatically reveal content on a future date).
+Install **Node.js 22.12+** (Node 24 LTS recommended), npm, and **MySQL 8.0.16+** (8.4 recommended). MySQL Workbench is optional and useful during the viva. Keep MySQL running.
 
----
+1. Extract/clone this project and open a terminal in the project folder.
+2. Install packages:
 
-## 🚀 Quick Start Guide
+   ```sh
+   npm ci
+   ```
 
-### 1. Prerequisites
-- **Node.js** v18+ or v20+
-- **npm** v9+
+3. Copy `.env.example` to `.env`. On Windows PowerShell:
 
-### 2. Installation & Run
-Inside the `campuscanva` folder:
-```bash
-# Install dependencies
-npm install
+   ```powershell
+   Copy-Item .env.example .env
+   ```
 
-# Start Vite development server
-npm run dev
+   On macOS/Linux:
+
+   ```sh
+   cp .env.example .env
+   ```
+
+4. Edit `.env` with your MySQL port, username and password. A typical local installation uses `DB_PORT=3306`, `DB_USER=root`; set `DB_PASSWORD` to your own MySQL password. Never commit `.env`.
+5. Initialize the database once:
+
+   ```sh
+   npm run db:setup
+   ```
+
+6. Start both the API and UI:
+
+   ```sh
+   npm run dev
+   ```
+
+7. Open **http://localhost:5173**. The API runs at http://localhost:5000. The UI proxies `/api` requests to the API.
+
+If using XAMPP, start its MySQL service and use its configured port/credentials. The code was tested on MySQL 8.4; MariaDB/XAMPP compatibility is intended but has not been separately verified.
+
+### Optional Docker database
+
+If Docker Desktop is already installed, instead of installing MySQL directly:
+
+```sh
+docker compose up -d
 ```
 
-Visit `http://localhost:5173` in your browser.
+Wait for the database to become healthy (`docker compose ps`), then set `DB_PORT=3307` and `DB_PASSWORD=campuscanva-local` in `.env`. Follow steps 5–7 above. The Compose volume retains the database when the container stops. `docker compose down` stops it; do not use `down -v` unless you want to erase its data.
 
----
+## Accounts for the presentation
 
-## 💎 Features & Highlights
+All seeded accounts use password **`CampusCanva123!`**.
 
-1. **Welcome Landing & 1-Click Evaluator Quick Access**:
-   - Evaluator / Viva Demo bar allows entering the application in 1 click as **Student (Kavya)**, **Faculty (Prof. Vivek Mehta)**, or **Alumni (Aman Verma)** without tedious registration.
-2. **Main Dashboard**:
-   - Live statistics calculated directly from the relational database state (Total Spaces, Photos & Videos, Community Members, Upcoming Time Capsules).
-   - Featured memory spaces, recent media feed, and popular campus spots.
-3. **Explore Memories**:
-   - Real-time search across titles, descriptions, and captions.
-   - Filter by **Campus Spot** (*Admin Block, Central Lawn, Amul Parlour, Nescafe, Auditorium, Library*).
-   - Filter by **Space Type** (*Event, Batch, Club, Trip, General*).
-   - Filter by **Creator** and sort by Newest / Oldest / Popular.
-   - Toggle between **Memory Spaces** and **All Media** views.
-4. **Memory Space Details**:
-   - Cover photograph, landmark spot association, member count, and creation date.
-   - Role-based permissions (`Admin`, `Contributor`, `Viewer`).
-   - Tabs: *Memories*, *Members (with role badges)*, and *About & Relational Schema*.
-5. **Interactive Media Lightbox**:
-   - High-resolution photo viewer and HTML5 video player.
-   - Reaction bar: Like 👍, Heart ❤️, Nostalgic 💭, Laugh 😂 with optimistic toggle and duplicate prevention.
-   - Weak Entity **Comments Thread**: Displays `comment_no` (partial discriminator) + user info + timestamp.
-   - Tagged Users pills.
-6. **Time Capsules & Live Countdowns**:
-   - Real-time ticking countdown timers in Days : Hours : Minutes : Seconds.
-   - Frosted glass vault effect for locked capsules ("This memory is waiting for its moment.").
-   - Celebratory confetti animation upon opening unlocked capsules.
-7. **Campus Spots Directory**:
-   - Dedicated showcase of NSUT locations with space and photo counts.
-8. **Interactive DBMS Schema Inspector (Evaluation Mode)**:
-   - Click the **"Demo Mode"** toggle or **"Inspect SQL Tuple"** button anywhere in the app to open the slide-over drawer.
-   - Shows the active entity name, primary key constraints, foreign key referential integrity rules, ER cardinalities, and the exact corresponding SQL query!
+| Persona | Email | ID |
+| --- | --- | --- |
+| Student | kavya.cse@nsut.ac.in | 1 |
+| Faculty | vivek.mehta@nsut.ac.in | 5 |
+| Alumni | aman.alumni@nsut.ac.in | 7 |
 
----
+With `DEMO_LOGIN=true`, evaluator buttons can sign in as only these three seeded personas. This is an explicit localhost presentation shortcut. Set `DEMO_LOGIN=false` to require passwords for everyone. Regular login always verifies a bcrypt password hash. Sessions are stored in MySQL; APIs derive the acting user from the session, not a submitted user ID. The SQL Inspector toggle only controls educational UI and never switches the database.
 
-## 🗄️ Relational Database Schema & DBMS Concepts
+## What to show the teacher
 
-CampusCanva was engineered strictly according to Relational Database Management principles:
+See [docs/VIVA_GUIDE.md](docs/VIVA_GUIDE.md) for a 10-minute demonstration, normalization assumptions, relationship mapping, transactions and concurrency. [database/demo_queries.sql](database/demo_queries.sql) contains read-only SQL examples for Workbench.
 
+- **Dashboard:** live SQL counts and memory feeds.
+- **Database Lab:** live joins, aggregation, views and a HAVING/subquery report, with executed SQL.
+- **Space creation:** `trg_after_insert_space` creates the Admin membership automatically.
+- **Members:** Admins add/remove people and change roles. Viewers cannot upload. The creator must remain an Admin.
+- **Upload:** files up to 20 MB, file signature validation, local disk storage and relational media metadata. JPEG, PNG, WebP, GIF, MP4 and WebM are supported. Public URL import remains available.
+- **Comments:** weak entity with PK `(media_id, comment_no)`, concurrency-safe partial-key allocation and cascade deletion.
+- **Notifications:** tags, reactions, comments and membership changes create database rows.
+- **Time capsule:** server time gates content in feeds, direct lookup, interaction APIs, SQL Inspector and protected file URLs. Contributors can deposit files while locked. Time locks are immutable after creation.
+- **SQL Inspector:** displays real records retrieved from MySQL, with no password hashes.
+
+All spaces are shared with authenticated campus users in this version. Membership controls contribution and administration; private spaces and invitation approval are not implemented. Commenting/reacting is open to signed-in campus users on unlocked media.
+
+## Database design
+
+`database/schema.sql` defines 15 tables, two views, foreign keys, composite/unique keys, CHECK constraints, and triggers. `server/setup.ts` creates the schema and loads the realistic TypeScript seed dataset into SQL inside a transaction. Passwords are hashed during seeding.
+
+Key tables: `users`; user subtypes `student`, `alumni`, `faculty`; `campus_spot`; `memory_space`; `space_member`; `media_item`; media subtypes `photo`, `video`; `media_tag`; `reaction`; weak entity `comment`; `notification`; `app_session`.
+
+- User and media subtypes must match the parent's discriminator; direct mismatched subtype inserts/updates are rejected by triggers. The API creates the parent and required subtype in one transaction. Direct SQL users must also follow that transaction convention: SQL does not enforce total participation by itself.
+- Foreign keys cascade dependent rows. A deleted campus spot sets its spaces' spot reference to NULL.
+- Comment allocation locks/increments a counter on the parent media row. Concurrent comments get different partial keys; deleting a comment does not recycle its number.
+- An analytics view uses `COUNT(DISTINCT ...)` to prevent join fanout from inflating totals.
+- Database times are UTC; the browser renders them in the laptop's local timezone.
+- Files live in `server/uploads`; MySQL stores URLs and metadata, not file BLOBs. Back up both the database and the uploads folder.
+
+## Commands
+
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | API + Vite development UI |
+| `npm run db:setup` | Create and seed a fresh database; refuses to overwrite existing tables |
+| `npm run db:reset` | **Erase the configured database tables and reseed**; explicit development/demo reset |
+| `npm run build` | Strict TypeScript check and production frontend build |
+| `npm start` | Serve the API and built frontend at http://localhost:5000 |
+| `npm run lint` | Oxlint checks |
+| `npm test` | Request-validation tests, no database needed |
+| `npm run test:integration` | Real MySQL integration tests; requires isolated database ending in `_test` |
+
+Setup/reset uses DDL and is not an incremental migration system. Existing installations should back up first. Resetting SQL does not delete existing upload files; remove unwanted files manually after backing up. Never run reset before a presentation unless you deliberately want a clean dataset.
+
+### Integration test database
+
+Create a separate `.env.test` by copying `.env`, changing `DB_NAME=campuscanva_test`, and optionally setting `UPLOAD_DIR=server/test-uploads`. Then:
+
+```sh
+npm run db:test:setup
+npm run test:integration
 ```
-                            ┌────────────────┐
-                            │  CAMPUS_SPOT   │
-                            └───────┬────────┘
-                                    │ 0..1 (associated with)
-                                    ▼ 0..N
-┌────────────┐ creates 1:N  ┌────────────────┐ 1       N ┌────────────────┐
-│   USERS    │─────────────>│  MEMORY_SPACE  │──────────>│   MEDIA_ITEM   │
-└─────┬──────┘              └───────┬────────┘ contains  └───────┬────────┘
-      │                             │ 1                          │ 1
-      │                             ▼ M                          ▼ N (weak entity)
-      │                     ┌────────────────┐           ┌────────────────┐
-      │                     │  SPACE_MEMBER  │           │    COMMENT     │
-      │                     └────────────────┘           │ (media_id,     │
-      │                                                  │  comment_no)   │
-      │ ISA Specialization                               └────────────────┘
-      ├───────────────┬───────────────┐
-      ▼               ▼               ▼
-┌───────────┐   ┌───────────┐   ┌───────────┐
-│  STUDENT  │   │  ALUMNI   │   │  FACULTY  │
-└───────────┘   └───────────┘   └───────────┘
+
+The test command loads `.env.test` when present. Alternatively set those environment variables in your shell (as CI does). Tests refuse to run against a database whose name does not end in `_test`. They cover password checks, sessions, registration rollback, role checks, sealed capsules, concurrent comments, cascades, notifications, uploads and direct database constraints.
+
+### Frontend-only practice mode
+
+For UI practice without MySQL, set `VITE_DATA_MODE=mock` in `.env`, then run `npm run dev:client`. This explicitly uses the old browser-local simulation with demonstration-only authentication. It is not the MySQL project demonstration. Return to `VITE_DATA_MODE=mysql` and restart Vite for the viva. The landing/login connection status indicates the selected mode.
+
+### Browser integration check
+
+With MySQL/API/UI already running and seeded accounts available:
+
+```sh
+npx playwright install chromium
+npm run test:browser
 ```
 
-### 1. Generalization / Specialization (ISA Hierarchy)
-- **Table-per-Subclass Strategy**:
-  - `users` (Superclass): `user_id (PK)`, `full_name`, `email (UNIQUE)`, `user_type`, `password_hash`, `joined_at`
-  - `student` (Subclass): `user_id (PK & FK)`, `roll_number (UNIQUE)`, `department`, `batch_year`
-  - `alumni` (Subclass): `user_id (PK & FK)`, `graduation_year`, `current_company`
-  - `faculty` (Subclass): `user_id (PK & FK)`, `employee_no (UNIQUE)`, `department`, `designation`
-  - `photo` (Subclass of `media_item`): `media_id (PK & FK)`, `width`, `height`
-  - `video` (Subclass of `media_item`): `media_id (PK & FK)`, `duration_seconds`
+The browser test creates and removes its own demonstration space. It verifies login, SQL persistence after reload, file upload/deletion, report rendering and mobile overflow. Run it before your presentation, not during one. `TEST_BASE_URL` can target another local UI address; `CHROMIUM_PATH` can select an existing Chromium executable.
 
-### 2. Weak Entity Modeling: `comment`
-- A comment has no independent existence without its parent `media_item`.
-- **Composite Primary Key**: `(media_id, comment_no)`
-  - `media_id`: Foreign key referencing `media_item(media_id) ON DELETE CASCADE`
-  - `comment_no`: Partial key / discriminator (auto-calculated per media item)
+## Troubleshooting
 
-### 3. Many-to-Many (M:N) Relationships
-- `space_member`: Connects `memory_space` and `users` with attribute `role_type ENUM('Admin', 'Contributor', 'Viewer')`.
-- `media_tag`: Connects `media_item` and `users` with attribute `tagged_at`.
-- `reaction`: Connects `media_item` and `users` with `reaction_type`.
+- **Access denied / ECONNREFUSED:** check MySQL is running and `.env` credentials/port are correct. The backend fails clearly rather than silently falling back to browser storage.
+- **Existing database:** `db:setup` intentionally preserves it. Use a different `DB_NAME`, or back up and deliberately run `db:reset`.
+- **Port 5173 already used:** stop the other Vite process. If you change ports, update `APP_ORIGINS` in `.env`.
+- **Photos fail without internet:** original seed photos are remote sample URLs. Upload your own local images before the presentation; those files work without internet. The database/API/UI themselves run locally.
+- **Authentication expired:** log in again. Logging out revokes the MySQL session.
+- **Browser cache after switching modes:** restart Vite and reload the page. Mock and MySQL datasets are independent.
 
-### 4. Integrity Constraints
-- `CHECK ((is_time_locked = FALSE) OR (is_time_locked = TRUE AND unlock_date IS NOT NULL))`
-- `ON DELETE CASCADE` across all child relationships ensuring zero orphaned records.
-
----
-
-## 🔌 Connecting to Node.js + Express + MySQL
-
-The frontend contains a clean, decoupled service layer in `src/services/api.ts`.
-
-To switch from the simulated mock database to your live Express backend:
-1. Open `src/services/api.ts`
-2. Change `const USE_MOCK_API = true;` to `const USE_MOCK_API = false;`
-3. Set `const BASE_URL = 'http://localhost:5000/api';`
-
-All service functions will immediately dispatch real HTTP `fetch` requests to your Express REST endpoints!
-
----
-
-## 🎓 DBMS Lab Viva Q&A Cheat Sheet
-
-| Question | Model Viva Answer |
-| :--- | :--- |
-| **Q1: Why is `COMMENT` modeled as a Weak Entity?** | *"Sir, comments cannot exist without a media item. We identify each comment by borrowing the owner's primary key `media_id` combined with a local partial discriminator `comment_no`. If a photo is deleted, its comments cascade-delete automatically."* |
-| **Q2: How did you implement Generalization / Specialization?** | *"We adopted the **Table-per-Subclass** mapping. `users` holds shared attributes (`user_id`, `email`, `full_name`), while `student`, `alumni`, and `faculty` share `user_id` as both Primary Key and Foreign Key. This avoids NULL attributes and achieves clean 3NF."* |
-| **Q3: What Normal Form is your schema in?** | *"The schema satisfies **BCNF**. Every relation is in 1NF (atomic attributes), 2NF (no partial dependencies on composite keys), 3NF (no transitive dependencies), and in all functional dependencies $X \rightarrow Y$, $X$ is a superkey."* |
-| **Q4: How does the Time Capsule work at the database level?** | *"We enforce a `CHECK` constraint ensuring an `unlock_date` is supplied whenever `is_time_locked = TRUE`. When queried, an SQL `CASE` expression or `VIEW` determines whether tuples should be accessible or gated behind the lock status."* |
-
----
-
-## 📁 Project Structure
-
-```
-campuscanva/
-├── src/
-│   ├── components/
-│   │   ├── cards/             # SpaceCard, TimeCapsuleCard
-│   │   ├── common/            # DBMSInspectorDrawer, ConfirmDialog, ImageWithFallback
-│   │   ├── modals/            # CreateSpaceModal, AddMemoryModal, MediaLightboxModal
-│   │   └── navigation/        # Navbar, Sidebar
-│   ├── context/               # AuthContext, ToastContext, DemoContext
-│   ├── data/                  # seedData.ts (Realistic NSUT community data)
-│   ├── layouts/               # AppLayout.tsx
-│   ├── pages/                 # WelcomeLanding, Login, Register, Dashboard,
-│   │                          # Explore, SpaceDetail, Spots, Capsules, Profile, Notifications
-│   ├── services/              # dbService.ts (relational logic), api.ts (REST adapter)
-│   ├── types/                 # TypeScript relational schema interfaces
-│   ├── App.tsx
-│   ├── index.css              # Tailwind CSS v4 styling
-│   └── main.tsx
-├── index.html
-├── package.json
-├── tsconfig.json
-└── vite.config.ts
-```
-#   C a m p u s C a n v a  
- 
+The project remains a localhost academic application. Hosting, private spaces, invitations, moderation, archive export and scheduled capsule reminder notifications are future work.

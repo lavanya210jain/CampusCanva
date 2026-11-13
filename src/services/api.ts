@@ -1,3 +1,4 @@
+import { liveApi } from './liveApi';
 import { dbService } from './dbService';
 import {
   FullUserProfile,
@@ -13,45 +14,31 @@ import {
   SpaceType,
   MemberRole,
   User,
+  RegistrationInput,
   Student,
   Alumni,
   Faculty,
   DBMSInspectData,
 } from '../types';
 
-/**
- * CampusCanva API Service Layer
- * 
- * DESIGNED FOR FUTURE BACKEND INTEGRATION:
- * When connecting to your Node.js + Express + MySQL backend, simply toggle
- * USE_MOCK_API to false and point BASE_URL to your server (e.g. http://localhost:5000/api).
+/** Browser-only practice adapter. The default exported API below uses MySQL.
+ * This simulation is for UI rehearsal and must never receive real credentials.
  */
-const USE_MOCK_API = true;
-const BASE_URL = 'http://localhost:5000/api';
-
 // Small async delay helper to simulate realistic network latency in demo
 const delay = (ms = 80) => new Promise((resolve) => setTimeout(resolve, ms));
 
-export const api = {
+export const demoApi = {
   // ==================== AUTHENTICATION ====================
-  async login(email: string, passwordHash: string): Promise<FullUserProfile> {
+  async login(email: string, _password: string): Promise<FullUserProfile> {
     await delay();
-    if (!USE_MOCK_API) {
-      const res = await fetch(`${BASE_URL}/auth/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password: passwordHash }),
-      });
-      if (!res.ok) throw new Error((await res.json()).message || 'Login failed');
-      return res.json();
-    }
+
     const user = dbService.getUserByEmail(email);
     if (!user) throw new Error('No user found with this email. Use quick demo login or register!');
     return user;
   },
 
   async register(
-    userData: Omit<User, 'user_id' | 'joined_at'>,
+    userData: RegistrationInput,
     specialized: {
       student?: Omit<Student, 'user_id'>;
       alumni?: Omit<Alumni, 'user_id'>;
@@ -59,15 +46,7 @@ export const api = {
     }
   ): Promise<FullUserProfile> {
     await delay();
-    if (!USE_MOCK_API) {
-      const res = await fetch(`${BASE_URL}/auth/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...userData, ...specialized }),
-      });
-      if (!res.ok) throw new Error((await res.json()).message || 'Registration failed');
-      return res.json();
-    }
+
     return dbService.registerUser(userData, specialized);
   },
 
@@ -265,3 +244,6 @@ export const api = {
     dbService.resetToSeeds();
   },
 };
+
+export const isMockMode = import.meta.env.VITE_DATA_MODE === "mock";
+export const api = isMockMode ? demoApi : liveApi;

@@ -1,3 +1,4 @@
+import { DataError } from '../components/common/DataError';
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FolderHeart, PlusCircle, Layers, ShieldCheck, ArrowRight } from 'lucide-react';
@@ -16,6 +17,7 @@ export const MySpacesPage: React.FC<MySpacesPageProps> = ({ onOpenCreateModal })
   const [spots, setSpots] = useState<CampusSpot[]>([]);
   const [mediaList, setMediaList] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
 
   useEffect(() => {
     if (!currentUser) return;
@@ -30,7 +32,7 @@ export const MySpacesPage: React.FC<MySpacesPageProps> = ({ onOpenCreateModal })
         setSpots(st);
         setMediaList(me);
       } catch (e) {
-        console.error(e);
+        setLoadError(e instanceof Error ? e.message : 'Could not load data');
       } finally {
         setLoading(false);
       }
@@ -40,6 +42,7 @@ export const MySpacesPage: React.FC<MySpacesPageProps> = ({ onOpenCreateModal })
 
   return (
     <div className="space-y-8 pb-16">
+      <DataError message={loadError} />
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>

@@ -1,3 +1,5 @@
+import { MediaThumbnail } from '../components/common/MediaThumbnail';
+import { DataError } from '../components/common/DataError';
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
@@ -42,6 +44,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
     upcomingCapsules: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
 
   useEffect(() => {
     const loadDashboard = async () => {
@@ -57,7 +60,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         setSpots(loadedSpots);
         setStats(loadedStats);
       } catch (e) {
-        console.error(e);
+        setLoadError(e instanceof Error ? e.message : 'Could not load data');
       } finally {
         setLoading(false);
       }
@@ -71,6 +74,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
 
   return (
     <div className="space-y-10 pb-16">
+      <DataError message={loadError} />
       {/* 1. Visually Attractive Hero Banner */}
       <section className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-indigo-900 via-indigo-800 to-purple-900 text-white p-6 sm:p-10 shadow-xl border border-indigo-700/50">
         <div className="relative z-10 max-w-2xl">
@@ -215,11 +219,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
               onClick={() => onOpenMediaLightbox(m)}
               className="group relative aspect-4/3 rounded-2xl overflow-hidden bg-slate-900 cursor-pointer shadow-xs hover:shadow-xl transition-all duration-300"
             >
-              <ImageWithFallback
-                src={m.media_url}
-                alt={m.caption}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
+              <MediaThumbnail media={m} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
 
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-3 flex flex-col justify-end">
                 <p className="text-xs font-medium text-white line-clamp-1">{m.caption}</p>

@@ -1,3 +1,4 @@
+import { DataError } from '../components/common/DataError';
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, Layers, Image as ImageIcon, ArrowRight } from 'lucide-react';
@@ -10,6 +11,7 @@ export const CampusSpotsPage: React.FC = () => {
   const [spaces, setSpaces] = useState<MemorySpace[]>([]);
   const [mediaList, setMediaList] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -23,7 +25,7 @@ export const CampusSpotsPage: React.FC = () => {
         setSpaces(sp);
         setMediaList(me);
       } catch (e) {
-        console.error(e);
+        setLoadError(e instanceof Error ? e.message : 'Could not load data');
       } finally {
         setLoading(false);
       }
@@ -33,6 +35,7 @@ export const CampusSpotsPage: React.FC = () => {
 
   return (
     <div className="space-y-8 pb-16">
+      <DataError message={loadError} />
       {/* Header */}
       <div>
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold mb-2">

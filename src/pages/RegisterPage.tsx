@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { PhoneInput } from "../components/common/PhoneInput";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Layers,
   GraduationCap,
@@ -9,10 +10,10 @@ import {
   EyeOff,
   ArrowRight,
   ShieldAlert,
-} from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
-import { useToast } from '../context/ToastContext';
-import { UserType } from '../types';
+} from "lucide-react";
+import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
+import { UserType } from "../types";
 
 export const RegisterPage: React.FC = () => {
   const { register } = useAuth();
@@ -20,67 +21,82 @@ export const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
 
   // Common Fields
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [userType, setUserType] = useState<UserType>('STUDENT');
+  const [userType, setUserType] = useState<UserType>("STUDENT");
 
   // Student Subtype Fields
-  const [rollNumber, setRollNumber] = useState('');
-  const [department, setDepartment] = useState('Computer Science & Engineering');
-  const [batchYear, setBatchYear] = useState('2025');
+  const [rollNumber, setRollNumber] = useState("");
+  const [department, setDepartment] = useState(
+    "Computer Science & Engineering",
+  );
+  const [batchYear, setBatchYear] = useState("2025");
 
   // Alumni Subtype Fields
-  const [graduationYear, setGraduationYear] = useState('2023');
-  const [currentCompany, setCurrentCompany] = useState('');
+  const [graduationYear, setGraduationYear] = useState("2023");
+  const [currentCompany, setCurrentCompany] = useState("");
 
   // Faculty Subtype Fields
-  const [employeeNo, setEmployeeNo] = useState('');
-  const [facultyDept, setFacultyDept] = useState('Computer Science & Engineering');
-  const [designation, setDesignation] = useState('Assistant Professor');
+  const [employeeNo, setEmployeeNo] = useState("");
+  const [facultyDept, setFacultyDept] = useState(
+    "Computer Science & Engineering",
+  );
+  const [designation, setDesignation] = useState("Assistant Professor");
 
   const [loading, setLoading] = useState(false);
-  const [errorMsg, setErrorMsg] = useState('');
+  const [errorMsg, setErrorMsg] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrorMsg('');
+    setErrorMsg("");
 
     if (password !== confirmPassword) {
-      setErrorMsg('Passwords do not match.');
+      setErrorMsg("Passwords do not match.");
       return;
     }
     if (password.length < 8) {
-      setErrorMsg('Password should be at least 8 characters.');
+      setErrorMsg("Password should be at least 8 characters.");
       return;
     }
 
     setLoading(true);
     try {
       const specializedData: {
-        student?: { roll_number: string; department: string; batch_year: number };
+        student?: {
+          roll_number: string;
+          department: string;
+          batch_year: number;
+        };
         alumni?: { graduation_year: number; current_company: string };
-        faculty?: { employee_no: string; department: string; designation: string };
+        faculty?: {
+          employee_no: string;
+          department: string;
+          designation: string;
+        };
       } = {};
 
-      if (userType === 'STUDENT') {
-        if (!rollNumber.trim()) throw new Error('Roll number is required for students.');
+      if (userType === "STUDENT") {
+        if (!rollNumber.trim())
+          throw new Error("Roll number is required for students.");
         specializedData.student = {
           roll_number: rollNumber.trim(),
           department,
           batch_year: parseInt(batchYear, 10),
         };
-      } else if (userType === 'ALUMNI') {
-        if (!currentCompany.trim()) throw new Error('Current company is required for alumni.');
+      } else if (userType === "ALUMNI") {
+        if (!currentCompany.trim())
+          throw new Error("Current company is required for alumni.");
         specializedData.alumni = {
           graduation_year: parseInt(graduationYear, 10),
           current_company: currentCompany.trim(),
         };
-      } else if (userType === 'FACULTY') {
-        if (!employeeNo.trim()) throw new Error('Employee number is required for faculty.');
+      } else if (userType === "FACULTY") {
+        if (!employeeNo.trim())
+          throw new Error("Employee number is required for faculty.");
         specializedData.faculty = {
           employee_no: employeeNo.trim(),
           department: facultyDept,
@@ -96,19 +112,19 @@ export const RegisterPage: React.FC = () => {
           user_type: userType,
           password,
           avatar_url: `https://images.unsplash.com/photo-${
-            userType === 'STUDENT'
-              ? '1534528741775-53994a69daeb'
-              : userType === 'FACULTY'
-              ? '1472099645785-5658abf4ff4e'
-              : '1500648767791-00dcc994a43e'
+            userType === "STUDENT"
+              ? "1534528741775-53994a69daeb"
+              : userType === "FACULTY"
+                ? "1472099645785-5658abf4ff4e"
+                : "1500648767791-00dcc994a43e"
           }?auto=format&fit=crop&w=300&q=80`,
         },
-        specializedData
+        specializedData,
       );
 
-      navigate('/dashboard');
+      navigate("/dashboard");
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Registration failed';
+      const msg = err instanceof Error ? err.message : "Registration failed";
       setErrorMsg(msg);
     } finally {
       setLoading(false);
@@ -122,12 +138,19 @@ export const RegisterPage: React.FC = () => {
           <div className="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center text-white shadow-lg shadow-indigo-100">
             <Layers className="w-6 h-6" />
           </div>
-          <span className="font-extrabold text-2xl tracking-tight text-slate-900">CampusCanva</span>
+          <span className="font-extrabold text-2xl tracking-tight text-slate-900">
+            CampusCanva
+          </span>
         </Link>
-        <h2 className="mt-3 text-2xl font-bold text-slate-900">Create Campus Identity</h2>
+        <h2 className="mt-3 text-2xl font-bold text-slate-900">
+          Create Campus Identity
+        </h2>
         <p className="mt-1 text-xs text-slate-500">
-          Already registered?{' '}
-          <Link to="/login" className="font-semibold text-indigo-600 hover:text-indigo-500">
+          Already registered?{" "}
+          <Link
+            to="/login"
+            className="font-semibold text-indigo-600 hover:text-indigo-500"
+          >
             Sign in here
           </Link>
         </p>
@@ -151,11 +174,11 @@ export const RegisterPage: React.FC = () => {
               <div className="grid grid-cols-3 gap-2">
                 <button
                   type="button"
-                  onClick={() => setUserType('STUDENT')}
+                  onClick={() => setUserType("STUDENT")}
                   className={`flex flex-col items-center justify-center p-3 rounded-2xl border text-xs font-bold transition ${
-                    userType === 'STUDENT'
-                      ? 'bg-indigo-50 border-indigo-500 text-indigo-700 shadow-xs'
-                      : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                    userType === "STUDENT"
+                      ? "bg-indigo-50 border-indigo-500 text-indigo-700 shadow-xs"
+                      : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
                   }`}
                 >
                   <GraduationCap className="w-5 h-5 mb-1" />
@@ -164,11 +187,11 @@ export const RegisterPage: React.FC = () => {
 
                 <button
                   type="button"
-                  onClick={() => setUserType('ALUMNI')}
+                  onClick={() => setUserType("ALUMNI")}
                   className={`flex flex-col items-center justify-center p-3 rounded-2xl border text-xs font-bold transition ${
-                    userType === 'ALUMNI'
-                      ? 'bg-amber-50 border-amber-500 text-amber-700 shadow-xs'
-                      : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                    userType === "ALUMNI"
+                      ? "bg-amber-50 border-amber-500 text-amber-700 shadow-xs"
+                      : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
                   }`}
                 >
                   <Briefcase className="w-5 h-5 mb-1" />
@@ -177,11 +200,11 @@ export const RegisterPage: React.FC = () => {
 
                 <button
                   type="button"
-                  onClick={() => setUserType('FACULTY')}
+                  onClick={() => setUserType("FACULTY")}
                   className={`flex flex-col items-center justify-center p-3 rounded-2xl border text-xs font-bold transition ${
-                    userType === 'FACULTY'
-                      ? 'bg-purple-50 border-purple-500 text-purple-700 shadow-xs'
-                      : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
+                    userType === "FACULTY"
+                      ? "bg-purple-50 border-purple-500 text-purple-700 shadow-xs"
+                      : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100"
                   }`}
                 >
                   <UserCheck className="w-5 h-5 mb-1" />
@@ -199,7 +222,7 @@ export const RegisterPage: React.FC = () => {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Kavya Gupta"
+                  placeholder="Your full name"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-hidden focus:bg-white focus:border-indigo-500 transition"
@@ -213,13 +236,15 @@ export const RegisterPage: React.FC = () => {
                 <input
                   type="email"
                   required
-                  placeholder="kavya@nsut.ac.in"
+                  placeholder="you@nsut.ac.in"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-hidden focus:bg-white focus:border-indigo-500 transition"
                 />
               </div>
             </div>
+
+            <PhoneInput id="register-phone" value={phone} onChange={setPhone} />
 
             {/* Passwords */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -229,11 +254,11 @@ export const RegisterPage: React.FC = () => {
                 </label>
                 <div className="relative">
                   <input
-                    type={showPassword ? 'text' : 'password'}
+                    type={showPassword ? "text" : "password"}
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Min 6 characters"
+                    placeholder="Min 8 characters"
                     className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-hidden focus:bg-white focus:border-indigo-500 transition"
                   />
                   <button
@@ -241,7 +266,11 @@ export const RegisterPage: React.FC = () => {
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                   >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    {showPassword ? (
+                      <EyeOff className="w-4 h-4" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
                   </button>
                 </div>
               </div>
@@ -263,25 +292,29 @@ export const RegisterPage: React.FC = () => {
 
             {/* CONDITIONAL SPECIALIZATION FIELDS */}
             <div className="pt-2">
-              {userType === 'STUDENT' && (
+              {userType === "STUDENT" && (
                 <div className="p-4 rounded-2xl bg-indigo-50/50 border border-indigo-100 space-y-3 animate-fade-in">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-700 block">
                     Student Sub-Entity Attributes
                   </span>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">Roll Number *</label>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">
+                        Roll Number *
+                      </label>
                       <input
                         type="text"
                         required
-                        placeholder="2025UCS1583"
+                        placeholder="Your roll number"
                         value={rollNumber}
                         onChange={(e) => setRollNumber(e.target.value)}
                         className="w-full px-3 py-1.5 bg-white border border-indigo-200 rounded-xl text-xs"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">Batch Year *</label>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">
+                        Batch Year *
+                      </label>
                       <input
                         type="number"
                         required
@@ -292,7 +325,9 @@ export const RegisterPage: React.FC = () => {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">Department</label>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      Department
+                    </label>
                     <input
                       type="text"
                       value={department}
@@ -303,14 +338,16 @@ export const RegisterPage: React.FC = () => {
                 </div>
               )}
 
-              {userType === 'ALUMNI' && (
+              {userType === "ALUMNI" && (
                 <div className="p-4 rounded-2xl bg-amber-50/50 border border-amber-100 space-y-3 animate-fade-in">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 block">
                     Alumni Sub-Entity Attributes
                   </span>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">Graduation Year *</label>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">
+                        Graduation Year *
+                      </label>
                       <input
                         type="number"
                         required
@@ -320,7 +357,9 @@ export const RegisterPage: React.FC = () => {
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">Current Company *</label>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">
+                        Current Company *
+                      </label>
                       <input
                         type="text"
                         required
@@ -334,14 +373,16 @@ export const RegisterPage: React.FC = () => {
                 </div>
               )}
 
-              {userType === 'FACULTY' && (
+              {userType === "FACULTY" && (
                 <div className="p-4 rounded-2xl bg-purple-50/50 border border-purple-100 space-y-3 animate-fade-in">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-purple-700 block">
                     Faculty Sub-Entity Attributes
                   </span>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">Employee Number *</label>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">
+                        Employee Number *
+                      </label>
                       <input
                         type="text"
                         required
@@ -352,7 +393,9 @@ export const RegisterPage: React.FC = () => {
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">Designation *</label>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">
+                        Designation *
+                      </label>
                       <input
                         type="text"
                         required
@@ -363,7 +406,9 @@ export const RegisterPage: React.FC = () => {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">Department</label>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">
+                      Department
+                    </label>
                     <input
                       type="text"
                       value={facultyDept}
@@ -380,7 +425,9 @@ export const RegisterPage: React.FC = () => {
               disabled={loading}
               className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-xl shadow-md shadow-indigo-100 transition disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              <span>{loading ? 'Creating Account...' : 'Complete Registration'}</span>
+              <span>
+                {loading ? "Creating Account..." : "Complete Registration"}
+              </span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>

@@ -1,10 +1,10 @@
-import { useDialog } from '../../hooks/useDialog';
-import React, { useState } from 'react';
-import { X, Lock, Sparkles, Image as ImageIcon, MapPin } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
-import { useToast } from '../../context/ToastContext';
-import { api } from '../../services/api';
-import { SpaceType, CampusSpot, MemorySpace } from '../../types';
+import { useDialog } from "../../hooks/useDialog";
+import React, { useState } from "react";
+import { X, Lock, Sparkles, Image as ImageIcon, MapPin } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
+import { useToast } from "../../context/ToastContext";
+import { api, isMockMode } from "../../services/api";
+import { SpaceType, CampusSpot, MemorySpace } from "../../types";
 
 interface CreateSpaceModalProps {
   isOpen: boolean;
@@ -14,11 +14,26 @@ interface CreateSpaceModalProps {
 }
 
 const PRESET_COVERS = [
-  { label: 'Campus Fest', url: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1000&q=80' },
-  { label: 'College Lawn', url: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1000&q=80' },
-  { label: 'Tech Hackathon', url: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1000&q=80' },
-  { label: 'Admin Heritage', url: 'https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=1000&q=80' },
-  { label: 'Cafe & Chai', url: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=1000&q=80' },
+  {
+    label: "Campus Fest",
+    url: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1000&q=80",
+  },
+  {
+    label: "College Lawn",
+    url: "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1000&q=80",
+  },
+  {
+    label: "Tech Hackathon",
+    url: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1000&q=80",
+  },
+  {
+    label: "Admin Heritage",
+    url: "https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=1000&q=80",
+  },
+  {
+    label: "Cafe & Chai",
+    url: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=1000&q=80",
+  },
 ];
 
 export const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
@@ -30,13 +45,14 @@ export const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
   const { currentUser } = useAuth();
   const { showToast } = useToast();
 
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [spaceType, setSpaceType] = useState<SpaceType>('Event');
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [spaceType, setSpaceType] = useState<SpaceType>("Event");
   const [spotId, setSpotId] = useState<number | null>(null);
   const [coverUrl, setCoverUrl] = useState(PRESET_COVERS[0].url);
+  const [visibility, setVisibility] = useState<"Public" | "Private">("Public");
   const [isTimeLocked, setIsTimeLocked] = useState(false);
-  const [unlockDate, setUnlockDate] = useState('');
+  const [unlockDate, setUnlockDate] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   const dialogRef = useDialog(isOpen, onClose);
@@ -45,21 +61,24 @@ export const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentUser) {
-      showToast('You must be logged in to create a space', 'error');
+      showToast("You must be logged in to create a space", "error");
       return;
     }
     if (!title.trim()) {
-      showToast('Space title is required', 'error');
+      showToast("Space title is required", "error");
       return;
     }
     if (isTimeLocked) {
       if (!unlockDate) {
-        showToast('Please specify an unlock date for the time capsule', 'error');
+        showToast(
+          "Please specify an unlock date for the time capsule",
+          "error",
+        );
         return;
       }
       const unlockTime = new Date(unlockDate).getTime();
       if (unlockTime <= Date.now()) {
-        showToast('Unlock date must be in the future', 'error');
+        showToast("Unlock date must be in the future", "error");
         return;
       }
     }
@@ -72,28 +91,42 @@ export const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
         space_type: spaceType,
         spot_id: spotId,
         cover_url: coverUrl.trim(),
+        visibility,
         is_time_locked: isTimeLocked,
         unlock_date: isTimeLocked ? unlockDate : null,
       });
 
-      showToast(`Memory Space "${created.title}" created successfully!`, 'success');
+      showToast(
+        `Memory Space "${created.title}" created successfully!`,
+        "success",
+      );
       onSpaceCreated(created);
       onClose();
 
       // Reset form
-      setTitle('');
-      setDescription('');
+      setVisibility("Public");
+      setTitle("");
+      setDescription("");
       setIsTimeLocked(false);
-      setUnlockDate('');
+      setUnlockDate("");
     } catch (err) {
-      showToast('Failed to create memory space', 'error');
+      showToast(
+        err instanceof Error ? err.message : "Failed to create memory space",
+        "error",
+      );
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <div ref={dialogRef} role="dialog" aria-modal="true" aria-label="Create memory space" className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-fade-in overflow-y-auto">
+    <div
+      ref={dialogRef}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Create memory space"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-fade-in overflow-y-auto"
+    >
       <div className="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl border border-slate-100 my-8">
         <div className="flex items-center justify-between pb-4 border-b border-slate-100">
           <div className="flex items-center gap-3">
@@ -101,16 +134,50 @@ export const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-slate-900">Create Memory Space</h2>
-              <p className="text-xs text-slate-500">Collaborative archive for college experiences</p>
+              <h2 className="text-lg font-bold text-slate-900">
+                Create Memory Space
+              </h2>
+              <p className="text-xs text-slate-500">
+                Collaborative archive for college experiences
+              </p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 rounded-xl transition">
+          <button
+            onClick={onClose}
+            className="p-2 text-slate-400 hover:text-slate-600 rounded-xl transition"
+          >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="mt-5 space-y-4">
+          <div>
+            <label
+              htmlFor="space-visibility"
+              className="block text-sm font-semibold mb-1"
+            >
+              Who can see this space?
+            </label>
+            <select
+              id="space-visibility"
+              value={visibility}
+              onChange={(e) =>
+                setVisibility(e.target.value as "Public" | "Private")
+              }
+              className="w-full border border-slate-200 rounded-xl p-2"
+            >
+              <option value="Public">
+                Public — all signed-in campus users
+              </option>
+              <option value="Private" disabled={isMockMode}>
+                Private — only members added by an Admin
+              </option>
+            </select>
+            <p className="text-xs text-slate-500 mt-1">
+              Admins can change this later under About. Private spaces are
+              hidden from other users.
+            </p>
+          </div>
           {/* Title */}
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
@@ -164,8 +231,12 @@ export const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
                 Campus Spot (Location)
               </label>
               <select
-                value={spotId || ''}
-                onChange={(e) => setSpotId(e.target.value ? parseInt(e.target.value, 10) : null)}
+                value={spotId || ""}
+                onChange={(e) =>
+                  setSpotId(
+                    e.target.value ? parseInt(e.target.value, 10) : null,
+                  )
+                }
                 className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:outline-hidden focus:bg-white focus:border-indigo-500 transition"
               >
                 <option value="">None / Off-Campus</option>
@@ -193,7 +264,9 @@ export const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
               />
             </div>
             <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="text-[10px] text-slate-400 font-semibold uppercase">Quick Pick:</span>
+              <span className="text-[10px] text-slate-400 font-semibold uppercase">
+                Quick Pick:
+              </span>
               {PRESET_COVERS.map((preset, idx) => (
                 <button
                   type="button"
@@ -201,8 +274,8 @@ export const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
                   onClick={() => setCoverUrl(preset.url)}
                   className={`text-[11px] px-2.5 py-1 rounded-lg border transition ${
                     coverUrl === preset.url
-                      ? 'bg-indigo-50 border-indigo-300 text-indigo-700 font-semibold'
-                      : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                      ? "bg-indigo-50 border-indigo-300 text-indigo-700 font-semibold"
+                      : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
                   }`}
                 >
                   {preset.label}
@@ -219,8 +292,12 @@ export const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
                   <Lock className="w-4 h-4" />
                 </div>
                 <div>
-                  <span className="text-sm font-bold text-slate-900">Enable Time Capsule Feature</span>
-                  <p className="text-xs text-slate-500">Lock memories until a designated future reveal date</p>
+                  <span className="text-sm font-bold text-slate-900">
+                    Enable Time Capsule Feature
+                  </span>
+                  <p className="text-xs text-slate-500">
+                    Lock memories until a designated future reveal date
+                  </p>
                 </div>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
@@ -247,7 +324,8 @@ export const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
                   required={isTimeLocked}
                 />
                 <p className="text-[11px] text-amber-800 mt-1">
-                  * Evaluators: Sets a conditional unlock constraint in the database.
+                  * Evaluators: Sets a conditional unlock constraint in the
+                  database.
                 </p>
               </div>
             )}
@@ -267,7 +345,7 @@ export const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
               disabled={submitting}
               className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl shadow-md shadow-indigo-100 transition disabled:opacity-50"
             >
-              {submitting ? 'Creating...' : 'Create Space'}
+              {submitting ? "Creating..." : "Create Space"}
             </button>
           </div>
         </form>

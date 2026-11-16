@@ -66,6 +66,9 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
   const [newMemberId, setNewMemberId] = useState("");
   const [memberRole, setMemberRole] = useState<MemberRole>("Contributor");
   const [editing, setEditing] = useState(false);
+  const [editVisibility, setEditVisibility] = useState<"Public" | "Private">(
+    "Public",
+  );
   const [editTitle, setEditTitle] = useState("");
   const [editDescription, setEditDescription] = useState("");
   const [saving, setSaving] = useState(false);
@@ -715,12 +718,16 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
               About This Memory Space
             </h3>
             <p className="text-sm text-slate-600 leading-relaxed">
+              <span className="block mb-2 font-semibold text-indigo-700">
+                Visibility: {space.visibility || "Public"}
+              </span>
               {space.description}
             </p>
             {isAdmin && (
               <button
                 className="mt-3 text-sm font-semibold text-indigo-600"
                 onClick={() => {
+                  setEditVisibility(space.visibility || "Public");
                   setEditTitle(space.title);
                   setEditDescription(space.description);
                   setEditing(!editing);
@@ -737,6 +744,7 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
                   setSaving(true);
                   try {
                     await api.updateMemorySpace(spaceId, {
+                      visibility: editVisibility,
                       title: editTitle,
                       description: editDescription,
                     });
@@ -753,6 +761,22 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
                   }
                 }}
               >
+                <label className="block text-sm font-semibold">
+                  Who can see this space?
+                  <select
+                    aria-label="Space visibility"
+                    value={editVisibility}
+                    onChange={(e) =>
+                      setEditVisibility(e.target.value as "Public" | "Private")
+                    }
+                    className="block w-full border rounded-xl p-2 mt-1"
+                  >
+                    <option value="Public">
+                      Public — all signed-in campus users
+                    </option>
+                    <option value="Private">Private — members only</option>
+                  </select>
+                </label>
                 <input
                   aria-label="Space title"
                   required

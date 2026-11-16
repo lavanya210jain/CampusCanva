@@ -176,3 +176,11 @@ export function uploadMemory(
     xhr.send(form);
   });
 }
+
+export async function uploadAvatar(file:File, updates:Partial<User>):Promise<FullUserProfile> {
+  const body=new FormData();body.append('file',file);body.append('profile',JSON.stringify(updates));
+  const response=await fetch('/api/profile/avatar',{method:'POST',body,credentials:'same-origin'});
+  const data=await response.json();
+  if(!response.ok)throw new Error(data.message||'Could not upload profile photo');
+  return normalize(data) as FullUserProfile;
+}

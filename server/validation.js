@@ -1,4 +1,9 @@
 import { z } from "zod";
+import {
+  normalizePhone,
+  phoneIsValid,
+  PHONE_MESSAGE,
+} from "../shared/phone.js";
 export const id = z.coerce.number().int().positive();
 const text = (max) => z.string().trim().min(1).max(max);
 const url = z
@@ -8,8 +13,18 @@ const url = z
 export const profile = z.object({
   full_name: text(100),
   bio: z.string().trim().max(2000).optional(),
-  phone: z.string().trim().max(20).optional(),
-  avatar_url: url.optional(),
+  phone: z
+    .string()
+    .max(40)
+    .refine(phoneIsValid, PHONE_MESSAGE)
+    .transform(normalizePhone)
+    .optional(),
+  avatar_url: z
+    .union([
+      url,
+      z.string().regex(/^\/api\/avatars\/[0-9a-f-]+\.(jpg|png|webp|gif)$/),
+    ])
+    .optional(),
 });
 export const registration = profile
   .extend({
@@ -61,6 +76,7 @@ export const space = z
     space_type: z.enum(["Event", "Batch", "Club", "Trip", "General"]),
     spot_id: id.nullable().default(null),
     cover_url: url.default(""),
+    visibility: z.enum(["Public", "Private"]).default("Public"),
     is_time_locked: z.boolean().default(false),
     unlock_date: z.string().datetime({ offset: true }).nullable().default(null),
   })

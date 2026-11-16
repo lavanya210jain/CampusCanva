@@ -1,6 +1,7 @@
-import { MediaThumbnail } from '../components/common/MediaThumbnail';
-import { DataError } from '../components/common/DataError';
-import React, { useState, useEffect } from 'react';
+import { PhoneInput } from "../components/common/PhoneInput";
+import { MediaThumbnail } from "../components/common/MediaThumbnail";
+import { DataError } from "../components/common/DataError";
+import React, { useState, useEffect } from "react";
 import {
   User as UserIcon,
   Mail,
@@ -16,19 +17,21 @@ import {
   X,
   Save,
   Database,
-} from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
-import { useToast } from '../context/ToastContext';
-import { useDemo } from '../context/DemoContext';
-import { api } from '../services/api';
-import { MemorySpace, MediaItem } from '../types';
-import { ImageWithFallback } from '../components/common/ImageWithFallback';
+} from "lucide-react";
+import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
+import { useDemo } from "../context/DemoContext";
+import { api, isMockMode } from "../services/api";
+import { MemorySpace, MediaItem } from "../types";
+import { ImageWithFallback } from "../components/common/ImageWithFallback";
 
 interface ProfilePageProps {
   onOpenMediaLightbox: (media: MediaItem) => void;
 }
 
-export const ProfilePage: React.FC<ProfilePageProps> = ({ onOpenMediaLightbox }) => {
+export const ProfilePage: React.FC<ProfilePageProps> = ({
+  onOpenMediaLightbox,
+}) => {
   const { currentUser, updateProfile, switchUser, allUsers } = useAuth();
   const { showToast } = useToast();
   const { openInspector, isDemoMode } = useDemo();
@@ -36,14 +39,16 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onOpenMediaLightbox })
   const [mySpaces, setMySpaces] = useState<MemorySpace[]>([]);
   const [myMedia, setMyMedia] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState('');
+  const [loadError, setLoadError] = useState("");
 
   // Edit Modal State
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const [editName, setEditName] = useState('');
-  const [editBio, setEditBio] = useState('');
-  const [editPhone, setEditPhone] = useState('');
-  const [editAvatar, setEditAvatar] = useState('');
+  const [editName, setEditName] = useState("");
+  const [editBio, setEditBio] = useState("");
+  const [editPhone, setEditPhone] = useState("");
+  const [editAvatar, setEditAvatar] = useState("");
+  const [avatarFile, setAvatarFile] = useState<File | undefined>();
+  const [savingProfile, setSavingProfile] = useState(false);
 
   useEffect(() => {
     if (!currentUser) return;
@@ -53,10 +58,14 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onOpenMediaLightbox })
           api.getMemorySpaces(),
           api.getAllMedia(),
         ]);
-        setMySpaces(allSpaces.filter((s) => s.creator_id === currentUser.user_id));
-        setMyMedia(allMedia.filter((m) => m.uploader_id === currentUser.user_id));
+        setMySpaces(
+          allSpaces.filter((s) => s.creator_id === currentUser.user_id),
+        );
+        setMyMedia(
+          allMedia.filter((m) => m.uploader_id === currentUser.user_id),
+        );
       } catch (e) {
-        setLoadError(e instanceof Error ? e.message : 'Could not load data');
+        setLoadError(e instanceof Error ? e.message : "Could not load data");
       } finally {
         setLoading(false);
       }
@@ -68,25 +77,36 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onOpenMediaLightbox })
 
   const handleOpenEdit = () => {
     setEditName(currentUser.full_name);
-    setEditBio(currentUser.bio || '');
-    setEditPhone(currentUser.phone || '');
+    setEditBio(currentUser.bio || "");
+    setEditPhone(currentUser.phone || "");
     setEditAvatar(currentUser.avatar_url);
+    setAvatarFile(undefined);
     setIsEditOpen(true);
   };
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editName.trim()) {
-      showToast('Name cannot be empty', 'error');
+      showToast("Name cannot be empty", "error");
       return;
     }
-    try { await updateProfile({
-      full_name: editName.trim(),
-      bio: editBio.trim(),
-      phone: editPhone.trim(),
-      avatar_url: editAvatar.trim(),
-    });
-    setIsEditOpen(false); } catch { /* AuthContext displays the API error; keep the form open. */ }
+    setSavingProfile(true);
+    try {
+      await updateProfile(
+        {
+          full_name: editName.trim(),
+          bio: editBio.trim(),
+          phone: editPhone.trim(),
+          ...(avatarFile ? {} : { avatar_url: editAvatar.trim() }),
+        },
+        avatarFile,
+      );
+      setIsEditOpen(false);
+    } catch {
+      /* AuthContext displays the API error; keep the form open. */
+    } finally {
+      setSavingProfile(false);
+    }
   };
 
   return (
@@ -97,7 +117,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onOpenMediaLightbox })
         <div className="h-36 sm:h-48 bg-gradient-to-r from-indigo-600 via-indigo-700 to-purple-700 relative">
           {isDemoMode && (
             <button
-              onClick={() => openInspector('user', currentUser.user_id)}
+              onClick={() => openInspector("user", currentUser.user_id)}
               className="absolute top-4 right-4 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/40 hover:bg-black/60 text-white text-xs backdrop-blur-md transition border border-white/20"
             >
               <Database className="w-3.5 h-3.5" />
@@ -150,7 +170,10 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onOpenMediaLightbox })
           <div className="p-5 rounded-2xl bg-indigo-50/40 border border-indigo-100/80 mb-6">
             <div className="text-xs font-bold uppercase tracking-wider text-indigo-900 mb-3 flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-indigo-600" />
-              <span>Generalization / Specialization Data (Subtype: {currentUser.user_type})</span>
+              <span>
+                Generalization / Specialization Data (Subtype:{" "}
+                {currentUser.user_type})
+              </span>
             </div>
 
             {currentUser.student && (
@@ -245,7 +268,9 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onOpenMediaLightbox })
             </span>
             <span className="flex items-center gap-1.5 font-semibold">
               <Calendar className="w-4 h-4 text-slate-400" />
-              <span>Joined {new Date(currentUser.joined_at).toLocaleDateString()}</span>
+              <span>
+                Joined {new Date(currentUser.joined_at).toLocaleDateString()}
+              </span>
             </span>
           </div>
         </div>
@@ -253,7 +278,9 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onOpenMediaLightbox })
 
       {/* Uploaded Memories by this user */}
       <div className="space-y-4">
-        <h3 className="text-lg font-bold text-slate-900">Memories Uploaded by {currentUser.full_name}</h3>
+        <h3 className="text-lg font-bold text-slate-900">
+          Memories Uploaded by {currentUser.full_name}
+        </h3>
         {myMedia.length === 0 ? (
           <div className="bg-white rounded-3xl p-8 text-center border border-slate-200 text-xs text-slate-500">
             No memories uploaded by this persona yet.
@@ -266,7 +293,10 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onOpenMediaLightbox })
                 onClick={() => onOpenMediaLightbox(m)}
                 className="group relative aspect-square rounded-2xl overflow-hidden bg-slate-950 cursor-pointer shadow-xs hover:shadow-xl transition-all"
               >
-                <MediaThumbnail media={m} className="w-full h-full object-cover" />
+                <MediaThumbnail
+                  media={m}
+                  className="w-full h-full object-cover"
+                />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-3 flex flex-col justify-end">
                   <p className="text-xs text-white line-clamp-1">{m.caption}</p>
                 </div>
@@ -281,15 +311,25 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onOpenMediaLightbox })
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-fade-in">
           <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-              <h3 className="font-bold text-slate-900 text-base">Edit Profile Information</h3>
-              <button onClick={() => setIsEditOpen(false)} className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg">
+              <h3 className="font-bold text-slate-900 text-base">
+                Edit Profile Information
+              </h3>
+              <button
+                onClick={() => setIsEditOpen(false)}
+                className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <form onSubmit={handleSaveProfile} className="mt-4 space-y-3 text-xs">
+            <form
+              onSubmit={handleSaveProfile}
+              className="mt-4 space-y-3 text-xs"
+            >
               <div>
-                <label className="block font-semibold uppercase text-slate-600 mb-1">Full Name</label>
+                <label className="block font-semibold uppercase text-slate-600 mb-1">
+                  Full Name
+                </label>
                 <input
                   type="text"
                   value={editName}
@@ -300,7 +340,9 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onOpenMediaLightbox })
               </div>
 
               <div>
-                <label className="block font-semibold uppercase text-slate-600 mb-1">Bio / Status</label>
+                <label className="block font-semibold uppercase text-slate-600 mb-1">
+                  Bio / Status
+                </label>
                 <textarea
                   rows={2}
                   value={editBio}
@@ -309,26 +351,58 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onOpenMediaLightbox })
                 />
               </div>
 
-              <div>
-                <label className="block font-semibold uppercase text-slate-600 mb-1">Phone Number</label>
-                <input
-                  type="text"
-                  value={editPhone}
-                  onChange={(e) => setEditPhone(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
-                />
-              </div>
+              <PhoneInput
+                id="profile-phone"
+                value={editPhone}
+                onChange={setEditPhone}
+              />
 
               <div>
-                <label className="block font-semibold uppercase text-slate-600 mb-1">Avatar Image URL</label>
+                <label className="block font-semibold uppercase text-slate-600 mb-1">
+                  Avatar Image URL
+                </label>
                 <input
-                  type="url"
+                  type={editAvatar.startsWith("/api/avatars/") ? "text" : "url"}
+                  disabled={!!avatarFile}
                   value={editAvatar}
                   onChange={(e) => setEditAvatar(e.target.value)}
                   className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl"
                 />
               </div>
 
+              {!isMockMode && (
+                <div>
+                  <label
+                    htmlFor="avatar-file"
+                    className="block font-semibold text-slate-600 mb-1"
+                  >
+                    Or choose a profile photo from this laptop
+                  </label>
+                  <input
+                    id="avatar-file"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    disabled={savingProfile}
+                    onChange={(event) => {
+                      const file = event.target.files?.[0];
+                      if (file && file.size > 5 * 1024 * 1024) {
+                        showToast(
+                          "Profile photo must be 5 MB or smaller",
+                          "error",
+                        );
+                        setAvatarFile(undefined);
+                        event.target.value = "";
+                        return;
+                      }
+                      setAvatarFile(file);
+                    }}
+                  />
+                  <p className="mt-1 text-slate-500">
+                    JPEG, PNG, WebP or GIF, up to 5 MB. A selected file takes
+                    priority over the URL.
+                  </p>
+                </div>
+              )}
               <div className="pt-3 flex justify-end gap-2">
                 <button
                   type="button"
@@ -339,6 +413,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ onOpenMediaLightbox })
                 </button>
                 <button
                   type="submit"
+                  disabled={savingProfile}
                   className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-xs"
                 >
                   Save Changes

@@ -69,6 +69,7 @@ export const AddMemoryModal: React.FC<AddMemoryModalProps> = ({
   const [caption, setCaption] = useState("");
   const [taggedUserIds, setTaggedUserIds] = useState<number[]>([]);
   const [submitting, setSubmitting] = useState(false);
+  const [taggableUsers, setTaggableUsers] = useState<User[]>([]);
   const [allowedSpaces, setAllowedSpaces] = useState<MemorySpace[]>([]);
   const [file, setFile] = useState<File | null>(null);
   const [progress, setProgress] = useState(0);
@@ -102,6 +103,33 @@ export const AddMemoryModal: React.FC<AddMemoryModalProps> = ({
       active = false;
     };
   }, [isOpen, preselectedSpaceId, currentUser?.user_id, spaces]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    let active = true;
+    const selected = allowedSpaces.find(
+      (space) => space.space_id === selectedSpaceId,
+    );
+    if (selected?.visibility !== "Private") {
+      setTaggableUsers(allUsers);
+      return;
+    }
+    setTaggableUsers([]);
+    api
+      .getSpaceMembers(selectedSpaceId)
+      .then((members) => {
+        if (!active) return;
+        const people = members.map((member) => member.user);
+        setTaggableUsers(people);
+        setTaggedUserIds((ids) =>
+          ids.filter((id) => people.some((person) => person.user_id === id)),
+        );
+      })
+      .catch((error) => showToast(error.message, "error"));
+    return () => {
+      active = false;
+    };
+  }, [isOpen, selectedSpaceId, allowedSpaces, allUsers]);
 
   const dialogRef = useDialog(isOpen, onClose);
   if (!isOpen) return null;
@@ -324,7 +352,9 @@ export const AddMemoryModal: React.FC<AddMemoryModalProps> = ({
           {/* Media URL with Preview */}
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
-              {file && !isMockMode ? "Media URL (not needed for a selected file)" : "Media File URL *"}
+              {file && !isMockMode
+                ? "Media URL (not needed for a selected file)"
+                : "Media File URL *"}
             </label>
             <input
               type="url"
@@ -399,7 +429,7 @@ export const AddMemoryModal: React.FC<AddMemoryModalProps> = ({
               </span>
             </div>
             <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-1.5 border border-slate-200 rounded-xl bg-slate-50">
-              {allUsers.map((u) => {
+              {taggableUsers.map((u) => {
                 const isSelected = taggedUserIds.includes(u.user_id);
                 return (
                   <button

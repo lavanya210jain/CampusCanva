@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { Outlet, useNavigate, Navigate, NavLink } from 'react-router-dom';
-import { Navbar } from '../components/navigation/Navbar';
-import { Sidebar } from '../components/navigation/Sidebar';
-import { CreateSpaceModal } from '../components/modals/CreateSpaceModal';
-import { AddMemoryModal } from '../components/modals/AddMemoryModal';
-import { MediaLightboxModal } from '../components/modals/MediaLightboxModal';
-import { DBMSInspectorDrawer } from '../components/common/DBMSInspectorDrawer';
-import { api } from '../services/api';
-import { useAuth } from '../context/AuthContext';
-import { CampusSpot, MemorySpace, MediaItem } from '../types';
+import React, { useState, useEffect } from "react";
+import { Outlet, useNavigate, Navigate, NavLink } from "react-router-dom";
+import { Navbar } from "../components/navigation/Navbar";
+import { Sidebar } from "../components/navigation/Sidebar";
+import { CreateSpaceModal } from "../components/modals/CreateSpaceModal";
+import { AddMemoryModal } from "../components/modals/AddMemoryModal";
+import { MediaLightboxModal } from "../components/modals/MediaLightboxModal";
+import { DBMSInspectorDrawer } from "../components/common/DBMSInspectorDrawer";
+import { api } from "../services/api";
+import { useAuth } from "../context/AuthContext";
+import { CampusSpot, MemorySpace, MediaItem } from "../types";
 
 export const AppLayout: React.FC = () => {
   const { currentUser, isAuthenticated, isLoading } = useAuth();
@@ -22,12 +22,18 @@ export const AppLayout: React.FC = () => {
   // Modal States
   const [isCreateSpaceOpen, setIsCreateSpaceOpen] = useState(false);
   const [isAddMemoryOpen, setIsAddMemoryOpen] = useState(false);
-  const [targetSpaceIdForMemory, setTargetSpaceIdForMemory] = useState<number | undefined>(undefined);
-  const [activeLightboxMedia, setActiveLightboxMedia] = useState<MediaItem | null>(null);
+  const [targetSpaceIdForMemory, setTargetSpaceIdForMemory] = useState<
+    number | undefined
+  >(undefined);
+  const [activeLightboxMedia, setActiveLightboxMedia] =
+    useState<MediaItem | null>(null);
 
   const refreshData = async () => {
     try {
-      const [sp, st] = await Promise.all([api.getMemorySpaces(), api.getCampusSpots()]);
+      const [sp, st] = await Promise.all([
+        api.getMemorySpaces(),
+        api.getCampusSpots(),
+      ]);
       setSpaces(sp);
       setSpots(st);
 
@@ -42,6 +48,21 @@ export const AppLayout: React.FC = () => {
 
   useEffect(() => {
     refreshData();
+    if (!currentUser) return;
+    let active = true;
+    const poll = async () => {
+      try {
+        const data = await api.getNotifications(currentUser.user_id);
+        if (active) setUnreadNotifCount(data.filter((n) => !n.is_read).length);
+      } catch {
+        /* Retry at next interval. */
+      }
+    };
+    const timer = setInterval(poll, 5000);
+    return () => {
+      active = false;
+      clearInterval(timer);
+    };
   }, [currentUser]);
 
   const handleOpenAddMemory = (spaceId?: number) => {
@@ -53,7 +74,8 @@ export const AppLayout: React.FC = () => {
     setActiveLightboxMedia(media);
   };
 
-  if (isLoading) return <div className="p-10 text-center">Connecting to CampusCanva…</div>;
+  if (isLoading)
+    return <div className="p-10 text-center">Connecting to CampusCanva…</div>;
   if (!isAuthenticated) return <Navigate to="/login" replace />;
 
   return (
@@ -64,8 +86,28 @@ export const AppLayout: React.FC = () => {
         unreadCount={unreadNotifCount}
       />
 
-      <nav aria-label="Mobile navigation" className="md:hidden flex gap-2 overflow-x-auto bg-white border-b p-3 text-xs whitespace-nowrap">
-        {[['/dashboard','Dashboard'],['/explore','Explore'],['/my-spaces','My Spaces'],['/spots','Spots'],['/time-capsules','Capsules'],['/database-lab','Database Lab']].map(([path,label])=><NavLink key={path} to={path} className={({isActive})=>`px-3 py-2 rounded-lg ${isActive?'bg-indigo-100 text-indigo-800':'text-slate-600'}`}>{label}</NavLink>)}
+      <nav
+        aria-label="Mobile navigation"
+        className="md:hidden flex gap-2 overflow-x-auto bg-white border-b p-3 text-xs whitespace-nowrap"
+      >
+        {[
+          ["/dashboard", "Dashboard"],
+          ["/explore", "Explore"],
+          ["/my-spaces", "My Spaces"],
+          ["/spots", "Spots"],
+          ["/time-capsules", "Capsules"],
+          ["/database-lab", "Database Lab"],
+        ].map(([path, label]) => (
+          <NavLink
+            key={path}
+            to={path}
+            className={({ isActive }) =>
+              `px-3 py-2 rounded-lg ${isActive ? "bg-indigo-100 text-indigo-800" : "text-slate-600"}`
+            }
+          >
+            {label}
+          </NavLink>
+        ))}
       </nav>
       <div className="flex-1 flex max-w-7xl w-full mx-auto">
         {/* Left Desktop Sidebar */}
@@ -104,7 +146,7 @@ export const AppLayout: React.FC = () => {
         preselectedSpaceId={targetSpaceIdForMemory}
         onMemoryAdded={() => {
           refreshData();
-          setRevision(value => value + 1);
+          setRevision((value) => value + 1);
         }}
       />
 
@@ -114,7 +156,7 @@ export const AppLayout: React.FC = () => {
         onDeleteMedia={async (mediaId) => {
           await api.deleteMediaItem(mediaId);
           await refreshData();
-          setRevision(value => value + 1);
+          setRevision((value) => value + 1);
           setActiveLightboxMedia(null);
         }}
       />

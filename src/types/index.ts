@@ -64,6 +64,7 @@ export interface MemorySpace {
   description: string;
   space_type: SpaceType;
   cover_url: string;
+  visibility?: 'Public' | 'Private';
   is_time_locked: boolean;
   unlock_date: string | null;
   created_at: string;

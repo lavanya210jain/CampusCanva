@@ -1,4 +1,5 @@
 import express from "express";
+import { processCapsuleUnlocks } from "./capsules.js";
 import { reports } from "./reports.js";
 import cookieParser from "cookie-parser";
 import bcrypt from "bcryptjs";
@@ -15,6 +16,7 @@ import {
   spaceAccess,
   mediaAccess,
   accessibleSQL,
+  visibleSQL,
   notify,
   insertMedia,
   fail,
@@ -47,11 +49,9 @@ app.get("/api/health", async (req, res) => {
       demoLogin: process.env.DEMO_LOGIN === "true",
     });
   } catch {
-    res
-      .status(503)
-      .json({
-        message: "MySQL is unavailable. Check .env and run npm run db:setup.",
-      });
+    res.status(503).json({
+      message: "MySQL is unavailable. Check .env and run npm run db:setup.",
+    });
   }
 });
 app.post("/api/auth/login", async (req, res) => {
@@ -165,8 +165,8 @@ app.patch("/api/users/:id", async (req, res) => {
 app.get("/api/users/:id/spaces", async (req, res) =>
   res.json(
     await rows(
-      "SELECT s.*,m.role_type AS user_role FROM memory_space s JOIN space_member m ON m.space_id=s.space_id WHERE m.user_id=? ORDER BY s.created_at DESC",
-      [v.id.parse(req.params.id)],
+      `SELECT s.*,m.role_type AS user_role FROM memory_space s JOIN space_member m ON m.space_id=s.space_id WHERE m.user_id=? AND ${visibleSQL()} ORDER BY s.created_at DESC`,
+      [v.id.parse(req.params.id), req.userId],
     ),
   ),
 );
@@ -185,7 +185,8 @@ app.get("/api/spots/:id", async (req, res) =>
 app.get("/api/spaces", async (req, res) =>
   res.json(
     await rows(
-      "SELECT * FROM memory_space ORDER BY created_at DESC,space_id DESC",
+      `SELECT s.* FROM memory_space s WHERE ${visibleSQL()} ORDER BY created_at DESC,space_id DESC`,
+      [req.userId],
     ),
   ),
 );
@@ -197,7 +198,7 @@ app.post("/api/spaces", async (req, res) => {
   if (data.is_time_locked && new Date(data.unlock_date) <= new Date())
     fail(400, "Choose a future capsule unlock date");
   const result = await rows(
-    "INSERT INTO memory_space(creator_id,spot_id,title,description,space_type,cover_url,is_time_locked,unlock_date) VALUES(?,?,?,?,?,?,?,?)",
+    "INSERT INTO memory_space(creator_id,spot_id,title,description,space_type,cover_url,is_time_locked,unlock_date,visibility) VALUES(?,?,?,?,?,?,?,?,?)",
     [
       req.userId,
       data.spot_id,
@@ -207,6 +208,7 @@ app.post("/api/spaces", async (req, res) => {
       data.cover_url,
       data.is_time_locked,
       v.sqlDate(data.unlock_date),
+      data.visibility,
     ],
   );
   // trg_after_insert_space inserts the Admin membership in this same SQL statement.
@@ -225,13 +227,14 @@ app.patch("/api/spaces/:id", async (req, res) => {
       : null,
   });
   await rows(
-    "UPDATE memory_space SET title=?,description=?,space_type=?,spot_id=?,cover_url=? WHERE space_id=?",
+    "UPDATE memory_space SET title=?,description=?,space_type=?,spot_id=?,cover_url=?,visibility=? WHERE space_id=?",
     [
       data.title,
       data.description,
       data.space_type,
       data.spot_id,
       data.cover_url,
+      data.visibility,
       sid,
     ],
   );
@@ -356,7 +359,8 @@ app.delete("/api/spaces/:id/members/:uid", async (req, res) => {
 app.get("/api/media", async (req, res) =>
   res.json(
     await rows(
-      `SELECT m.*, (SELECT COUNT(*) FROM reaction r WHERE r.media_id=m.media_id) reaction_count FROM media_item m JOIN memory_space s ON s.space_id=m.space_id WHERE ${accessibleSQL} ORDER BY uploaded_at DESC,media_id DESC`,
+      `SELECT m.*, (SELECT COUNT(*) FROM reaction r WHERE r.media_id=m.media_id) reaction_count FROM media_item m JOIN memory_space s ON s.space_id=m.space_id WHERE ${accessibleSQL} AND ${visibleSQL()} ORDER BY uploaded_at DESC,media_id DESC`,
+      [req.userId],
     ),
   ),
 );
@@ -448,12 +452,73 @@ app.post(
     }
   },
 );
+const avatarUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024, files: 1, fields: 1 },
+});
+app.post(
+  "/api/profile/avatar",
+  avatarUpload.single("file"),
+  async (req, res) => {
+    if (!req.file) fail(400, "Choose a profile photo");
+    const { fileTypeFromBuffer } = await import("file-type");
+    const type = await fileTypeFromBuffer(req.file.buffer).catch(() => null);
+    if (
+      !type ||
+      !["image/jpeg", "image/png", "image/webp", "image/gif"].includes(
+        type.mime,
+      )
+    )
+      fail(400, "Profile photos must be JPEG, PNG, WebP or GIF");
+    const name = `${randomUUID()}.${type.ext}`;
+    const updates = v.profile
+      .partial()
+      .parse(JSON.parse(req.body.profile || "{}"));
+    const [old] = await rows("SELECT avatar_url FROM users WHERE user_id=?", [
+      req.userId,
+    ]);
+    const avatarPath = `/api/avatars/${name}`;
+    await mkdir(path.join(uploadDir, "avatars"), { recursive: true });
+    await writeFile(path.join(uploadDir, "avatars", name), req.file.buffer);
+    try {
+      const data = { ...updates, avatar_url: avatarPath };
+      await rows(
+        `UPDATE users SET ${Object.keys(data)
+          .map((k) => `${k}=?`)
+          .join(",")} WHERE user_id=?`,
+        [...Object.values(data), req.userId],
+      );
+    } catch (error) {
+      await unlink(path.join(uploadDir, "avatars", name)).catch(() => {});
+      throw error;
+    }
+    if (old.avatar_url?.startsWith("/api/avatars/"))
+      await unlink(
+        path.join(uploadDir, "avatars", path.basename(old.avatar_url)),
+      ).catch(() => {});
+    res.json(await userProfile(req.userId));
+  },
+);
+app.get("/api/avatars/:name", async (req, res) => {
+  if (!/^[0-9a-f-]+\.(jpg|png|webp|gif)$/.test(req.params.name))
+    fail(404, "Photo not found");
+  if (
+    !(
+      await rows("SELECT 1 FROM users WHERE avatar_url=?", [
+        `/api/avatars/${req.params.name}`,
+      ])
+    ).length
+  )
+    fail(404, "Photo not found");
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.sendFile(path.join(uploadDir, "avatars", req.params.name));
+});
 app.get("/api/files/:name", async (req, res) => {
   if (!/^[0-9a-f-]+\.(jpg|png|webp|gif|mp4|webm)$/.test(req.params.name))
     fail(404, "File not found");
   const [m] = await rows(
-    `SELECT m.media_id FROM media_item m JOIN memory_space s ON s.space_id=m.space_id WHERE m.media_url=? AND ${accessibleSQL}`,
-    [`/api/files/${req.params.name}`],
+    `SELECT m.media_id FROM media_item m JOIN memory_space s ON s.space_id=m.space_id WHERE m.media_url=? AND ${accessibleSQL} AND ${visibleSQL()}`,
+    [`/api/files/${req.params.name}`, req.userId],
   );
   if (!m) fail(404, "File not found or capsule is locked");
   res.setHeader("X-Content-Type-Options", "nosniff");
@@ -489,7 +554,20 @@ app.post("/api/media/:id/tags", async (req, res) => {
   const mid = v.id.parse(req.params.id),
     uid = v.id.parse(req.body.userId),
     m = await mediaAccess(mid, req.userId);
-  await spaceAccess(m.space_id, req.userId, ["Admin", "Contributor"]);
+  const taggedSpace = await spaceAccess(m.space_id, req.userId, [
+    "Admin",
+    "Contributor",
+  ]);
+  if (
+    taggedSpace.visibility === "Private" &&
+    !(
+      await rows("SELECT 1 FROM space_member WHERE space_id=? AND user_id=?", [
+        m.space_id,
+        uid,
+      ])
+    ).length
+  )
+    fail(400, "Add people as members before tagging them in a private space");
   await transaction(async (db) => {
     await rows(
       "INSERT IGNORE INTO media_tag(media_id,tagged_user_id) VALUES(?,?)",
@@ -653,14 +731,16 @@ app.delete("/api/media/:id/comments/:no", async (req, res) => {
   ]);
   res.json({ ok: true });
 });
-app.get("/api/notifications", async (req, res) =>
+app.get("/api/notifications", async (req, res) => {
+  await processCapsuleUnlocks();
   res.json(
     await rows(
-      "SELECT * FROM notification WHERE user_id=? ORDER BY created_at DESC,notification_id DESC",
-      [req.userId],
+      `SELECT n.* FROM notification n LEFT JOIN memory_space s ON s.space_id=n.space_id
+    WHERE n.user_id=? AND (n.space_id IS NULL OR ${visibleSQL()}) ORDER BY n.created_at DESC,n.notification_id DESC`,
+      [req.userId, req.userId],
     ),
-  ),
-);
+  );
+});
 app.patch("/api/notifications/read-all", async (req, res) => {
   await rows("UPDATE notification SET is_read=1 WHERE user_id=?", [req.userId]);
   res.json({ ok: true });
@@ -672,12 +752,15 @@ app.patch("/api/notifications/:id/read", async (req, res) => {
   );
   res.json({ ok: true });
 });
-app.get("/api/reports", async (req, res) => res.json(await reports()));
+app.get("/api/reports", async (req, res) =>
+  res.json(await reports(req.userId)),
+);
 app.get("/api/stats", async (req, res) =>
   res.json(
     (
       await rows(
-        `SELECT (SELECT COUNT(*) FROM memory_space) totalSpaces,(SELECT COUNT(*) FROM media_item m JOIN memory_space s ON s.space_id=m.space_id WHERE ${accessibleSQL}) totalMedia,(SELECT COUNT(*) FROM users) totalUsers,(SELECT COUNT(*) FROM memory_space WHERE is_time_locked=1 AND unlock_date>UTC_TIMESTAMP()) upcomingCapsules`,
+        `SELECT (SELECT COUNT(*) FROM memory_space s WHERE ${visibleSQL()}) totalSpaces,(SELECT COUNT(*) FROM media_item m JOIN memory_space s ON s.space_id=m.space_id WHERE ${accessibleSQL} AND ${visibleSQL()}) totalMedia,(SELECT COUNT(*) FROM users) totalUsers,(SELECT COUNT(*) FROM memory_space s WHERE is_time_locked=1 AND unlock_date>UTC_TIMESTAMP() AND ${visibleSQL()}) upcomingCapsules`,
+        [req.userId, req.userId, req.userId],
       )
     )[0],
   ),
@@ -720,6 +803,7 @@ app.get("/api/inspect/:type/:id", async (req, res) => {
     },
   }[type];
   if (!config) fail(400, "Unknown entity");
+  if (type === "space") await spaceAccess(identifier, req.userId);
   if (type === "media" || type === "comment")
     await mediaAccess(identifier, req.userId);
   const data = await rows(config.sql, [identifier]);
@@ -745,37 +829,33 @@ app.get("/{*path}", (req, res) =>
 app.use((error, req, res, next) => {
   if (res.headersSent) return next(error);
   if (error instanceof ZodError)
-    return res
-      .status(400)
-      .json({
-        message: error.issues
-          .map((i) => `${i.path.join(".")}: ${i.message}`)
-          .join("; "),
-      });
+    return res.status(400).json({
+      message: error.issues
+        .map((i) => `${i.path.join(".")}: ${i.message}`)
+        .join("; "),
+    });
   if (error.code === "ER_DUP_ENTRY")
-    return res
-      .status(409)
-      .json({
-        message:
-          "This email, roll number, employee number or relationship already exists",
-      });
+    return res.status(409).json({
+      message:
+        "This email, roll number, employee number or relationship already exists",
+    });
   if (error.code === "ER_NO_REFERENCED_ROW_2")
+    return res.status(400).json({
+      message: "A referenced user, campus spot or space does not exist",
+    });
+  if (error.code === "LIMIT_FILE_SIZE")
     return res
       .status(400)
       .json({
-        message: "A referenced user, campus spot or space does not exist",
+        message: "File is too large (profile photos: 5 MB; memories: 20 MB)",
       });
-  if (error.code === "LIMIT_FILE_SIZE")
-    return res.status(400).json({ message: "File must be 20 MB or smaller" });
   if (error.code?.startsWith("LIMIT_") || error instanceof SyntaxError)
     return res.status(400).json({ message: "Invalid request or upload" });
   if (!error.status || error.status >= 500)
     console.error(error.code || error.message);
-  res
-    .status(error.status || 500)
-    .json({
-      message: error.status
-        ? error.message
-        : "Database request failed. Check the server terminal and MySQL connection.",
-    });
+  res.status(error.status || 500).json({
+    message: error.status
+      ? error.message
+      : "Database request failed. Check the server terminal and MySQL connection.",
+  });
 });

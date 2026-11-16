@@ -18,8 +18,8 @@ import {
 export const SEED_USERS: (User & { password_hash: string })[] = [
   {
     user_id: 1,
-    full_name: 'Kavya Gupta',
-    email: 'kavya.cse@nsut.ac.in',
+    full_name: 'Demo Student',
+    email: 'student.demo@campuscanva.local',
     phone: '+91 98765 43210',
     user_type: 'STUDENT',
     password_hash: 'demo_hash_1',
@@ -62,8 +62,8 @@ export const SEED_USERS: (User & { password_hash: string })[] = [
   },
   {
     user_id: 5,
-    full_name: 'Prof. Vivek Mehta',
-    email: 'vivek.mehta@nsut.ac.in',
+    full_name: 'Demo Faculty',
+    email: 'faculty.demo@campuscanva.local',
     phone: '+91 98111 22334',
     user_type: 'FACULTY',
     password_hash: 'demo_hash_5',
@@ -84,8 +84,8 @@ export const SEED_USERS: (User & { password_hash: string })[] = [
   },
   {
     user_id: 7,
-    full_name: 'Aman Verma',
-    email: 'aman.alumni@nsut.ac.in',
+    full_name: 'Demo Alumni',
+    email: 'alumni.demo@campuscanva.local',
     phone: '+91 99999 11223',
     user_type: 'ALUMNI',
     password_hash: 'demo_hash_7',

@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { FullUserProfile, RegistrationInput, User, Student, Alumni, Faculty } from '../types';
 import { api, isMockMode } from '../services/api';
-import { sessionApi } from '../services/liveApi';
+import { sessionApi, uploadAvatar } from '../services/liveApi';
 import { useToast } from './ToastContext';
 
 interface AuthContextValue {
@@ -20,7 +20,7 @@ interface AuthContextValue {
   ) => Promise<void>;
   logout: () => void;
   switchUser: (userId: number) => Promise<void>;
-  updateProfile: (updates: Partial<User>) => Promise<void>;
+  updateProfile: (updates: Partial<User>, avatarFile?: File) => Promise<void>;
   refreshUsers: () => Promise<void>;
 }
 
@@ -140,10 +140,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const updateProfile = async (updates: Partial<User>) => {
+  const updateProfile = async (updates: Partial<User>, avatarFile?: File) => {
     if (!currentUser) return;
     try {
-      const updated = await api.updateProfile(currentUser.user_id, updates);
+      const updated = avatarFile && !isMockMode ? await uploadAvatar(avatarFile, updates) : await api.updateProfile(currentUser.user_id, updates);
       setCurrentUser(updated);
       await refreshUsers();
       showToast('Profile updated successfully!', 'success');

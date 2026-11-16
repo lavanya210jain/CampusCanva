@@ -10,7 +10,7 @@ export const LoginPage: React.FC = () => {
   const { showToast } = useToast();
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState('kavya.cse@nsut.ac.in');
+  const [email, setEmail] = useState('student.demo@campuscanva.local');
   const [password, setPassword] = useState('CampusCanva123!');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -155,8 +155,8 @@ export const LoginPage: React.FC = () => {
           </form>
 
           <div className="pt-2 text-center text-[11px] text-slate-400">
-            * Note: Demo uses client-side simulated auth. Real production authentication will connect to
-            bcrypt + JWT on the Express/MySQL backend.
+            Evaluator buttons sign in to sample accounts. Regular sign-in verifies your password through
+            bcrypt and database-backed sessions on the Express/MySQL backend.
           </div>
         </div>
       </div>

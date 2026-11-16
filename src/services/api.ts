@@ -95,6 +95,7 @@ export const demoApi = {
       space_type: SpaceType;
       spot_id: number | null;
       cover_url: string;
+      visibility?: 'Public' | 'Private';
       is_time_locked: boolean;
       unlock_date: string | null;
     }

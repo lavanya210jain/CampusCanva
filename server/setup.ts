@@ -1,6 +1,7 @@
 import "dotenv/config";
 import mysql from "mysql2/promise";
 import bcrypt from "bcryptjs";
+import { normalizePhone } from "../shared/phone.js";
 import { readFile } from "node:fs/promises";
 import { connectionOptions, database, pool } from "./db.js";
 import * as seed from "../src/data/seedData.ts";
@@ -40,7 +41,14 @@ try {
   }
   const password = await bcrypt.hash("CampusCanva123!", 12);
   const pairs: [string, any[]][] = [
-    ["users", seed.SEED_USERS.map((u) => ({ ...u, password_hash: password }))],
+    [
+      "users",
+      seed.SEED_USERS.map((u) => ({
+        ...u,
+        phone: normalizePhone(u.phone),
+        password_hash: password,
+      })),
+    ],
     ["student", seed.SEED_STUDENTS],
     ["alumni", seed.SEED_ALUMNI],
     ["faculty", seed.SEED_FACULTY],

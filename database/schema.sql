@@ -33,7 +33,8 @@ CREATE TABLE users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
     full_name VARCHAR(100) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
-    phone VARCHAR(20) (phone_number REGEXP '^[+]?[0-9]+$') NULL,
+    phone VARCHAR(20) NULL,
+    CONSTRAINT chk_user_phone CHECK (phone IS NULL OR phone='' OR phone REGEXP '^[6-9][0-9]{9}$'),
     user_type ENUM('STUDENT', 'ALUMNI', 'FACULTY') NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     avatar_url VARCHAR(2048) NULL,
@@ -92,6 +93,8 @@ CREATE TABLE memory_space (
     description TEXT NULL,
     space_type ENUM('Event', 'Batch', 'Club', 'Trip', 'General') NOT NULL,
     cover_url VARCHAR(2048) NULL,
+    visibility ENUM('Public','Private') NOT NULL DEFAULT 'Public',
+    unlock_notified_at DATETIME NULL,
     is_time_locked BOOLEAN NOT NULL DEFAULT FALSE,
     unlock_date DATETIME NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -250,6 +253,8 @@ GROUP BY ms.space_id, ms.title, ms.space_type, cs.spot_name, u.full_name, ms.is_
 -- Persistent notifications and opaque, expiring HTTP sessions.
 CREATE TABLE notification (
     notification_id INT AUTO_INCREMENT PRIMARY KEY,
+    space_id INT NULL,
+    CONSTRAINT fk_notification_space FOREIGN KEY(space_id) REFERENCES memory_space(space_id) ON DELETE CASCADE,
     user_id INT NOT NULL,
     sender_id INT NOT NULL,
     title VARCHAR(150) NOT NULL,

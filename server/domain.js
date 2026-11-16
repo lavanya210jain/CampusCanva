@@ -19,6 +19,8 @@ export async function userProfile(userId, db = pool) {
   );
   return { ...user, [subtype]: details };
 }
+export const visibleSQL = (alias = "s") =>
+  `(${alias}.visibility='Public' OR EXISTS (SELECT 1 FROM space_member access_member WHERE access_member.space_id=${alias}.space_id AND access_member.user_id=?))`;
 export const accessibleSQL =
   "(s.is_time_locked=0 OR s.unlock_date<=UTC_TIMESTAMP())";
 export async function spaceAccess(spaceId, userId, roles = null, db = pool) {
@@ -28,14 +30,15 @@ export async function spaceAccess(spaceId, userId, roles = null, db = pool) {
     db,
   );
   if (!s) fail(404, "Space not found");
+  if (s.visibility === "Private" && !s.user_role) fail(404, "Space not found");
   if (roles && !roles.includes(s.user_role))
     fail(403, "Your space role does not allow this action");
   return s;
 }
 export async function mediaAccess(mediaId, userId, db = pool) {
   const [m] = await rows(
-    `SELECT m.*,s.creator_id FROM media_item m JOIN memory_space s ON s.space_id=m.space_id WHERE m.media_id=? AND ${accessibleSQL}`,
-    [mediaId],
+    `SELECT m.*,s.creator_id FROM media_item m JOIN memory_space s ON s.space_id=m.space_id WHERE m.media_id=? AND ${accessibleSQL} AND ${visibleSQL()}`,
+    [mediaId, userId],
     db,
   );
   if (!m) fail(404, "Memory not found or capsule is still locked");
@@ -52,13 +55,26 @@ export async function notify(
 ) {
   if (userId === senderId) return;
   await rows(
-    "INSERT INTO notification(user_id,sender_id,type,title,message,target_url) VALUES(?,?,?,?,?,?)",
-    [userId, senderId, type, title, message, targetUrl],
+    "INSERT INTO notification(user_id,sender_id,type,title,message,target_url,space_id) VALUES(?,?,?,?,?,?,?)",
+    [
+      userId,
+      senderId,
+      type,
+      title,
+      message,
+      targetUrl,
+      /^\/spaces\/(\d+)$/.exec(targetUrl)?.[1] || null,
+    ],
     db,
   );
 }
 export async function insertMedia(db, spaceId, userId, data) {
-  await spaceAccess(spaceId, userId, ["Admin", "Contributor"], db);
+  const space = await spaceAccess(
+    spaceId,
+    userId,
+    ["Admin", "Contributor"],
+    db,
+  );
   const result = await rows(
     "INSERT INTO media_item(space_id,uploader_id,media_url,media_type,caption) VALUES(?,?,?,?,?)",
     [spaceId, userId, data.media_url, data.media_type, data.caption],
@@ -82,6 +98,17 @@ export async function insertMedia(db, spaceId, userId, data) {
       db,
     );
   for (const uid of new Set(data.tagged_user_ids)) {
+    if (
+      space.visibility === "Private" &&
+      !(
+        await rows(
+          "SELECT 1 FROM space_member WHERE space_id=? AND user_id=?",
+          [spaceId, uid],
+          db,
+        )
+      ).length
+    )
+      fail(400, "Add people as members before tagging them in a private space");
     await rows(
       "INSERT INTO media_tag(media_id,tagged_user_id) VALUES(?,?)",
       [mediaId, uid],

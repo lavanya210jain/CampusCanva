@@ -116,33 +116,33 @@ export const WelcomeLanding: React.FC = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mt-3">
                   <button
-                    onClick={() => handleQuickDemo(1, 'Kavya Gupta (Student Lead)')}
+                    onClick={() => handleQuickDemo(1, 'Demo Student')}
                     className="p-3 rounded-2xl bg-indigo-50/70 hover:bg-indigo-100/70 border border-indigo-100 text-left transition group"
                   >
                     <div className="text-xs font-bold text-indigo-950 group-hover:text-indigo-600">
-                      Kavya Gupta
+                      Demo Student
                     </div>
                     <div className="text-[10px] text-indigo-600 font-semibold mt-0.5 uppercase">Student Role</div>
                     <div className="text-[10px] text-slate-400 mt-1">Roll: 2025UCS1583</div>
                   </button>
 
                   <button
-                    onClick={() => handleQuickDemo(5, 'Prof. Vivek Mehta (Faculty)')}
+                    onClick={() => handleQuickDemo(5, 'Demo Faculty')}
                     className="p-3 rounded-2xl bg-purple-50/70 hover:bg-purple-100/70 border border-purple-100 text-left transition group"
                   >
                     <div className="text-xs font-bold text-purple-950 group-hover:text-purple-600">
-                      Vivek Mehta Sir
+                      Demo Faculty
                     </div>
                     <div className="text-[10px] text-purple-600 font-semibold mt-0.5 uppercase">Faculty Role</div>
                     <div className="text-[10px] text-slate-400 mt-1">CSE Dept Head</div>
                   </button>
 
                   <button
-                    onClick={() => handleQuickDemo(7, 'Aman Verma (Alumni)')}
+                    onClick={() => handleQuickDemo(7, 'Demo Alumni')}
                     className="p-3 rounded-2xl bg-amber-50/70 hover:bg-amber-100/70 border border-amber-100 text-left transition group"
                   >
                     <div className="text-xs font-bold text-amber-950 group-hover:text-amber-600">
-                      Aman Verma
+                      Demo Alumni
                     </div>
                     <div className="text-[10px] text-amber-600 font-semibold mt-0.5 uppercase">Alumni Role</div>
                     <div className="text-[10px] text-slate-400 mt-1">Google • 2023 Batch</div>

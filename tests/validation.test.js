@@ -57,3 +57,40 @@ test("URL imports reject executable schemes and invalid foreign keys", () => {
     false,
   );
 });
+
+test("phone validation accepts optional Indian mobile numbers and normalizes +91 formatting", () => {
+  assert.equal(
+    registration.parse({ ...student, phone: "+91 98765 43210" }).phone,
+    "9876543210",
+  );
+  assert.equal(registration.parse({ ...student, phone: "" }).phone, "");
+  for (const phone of [
+    "12345",
+    "98765432100",
+    "abcdefghij",
+    "5123456789",
+    "+1 9876543210",
+  ]) {
+    assert.equal(
+      registration.safeParse({ ...student, phone }).success,
+      false,
+      phone,
+    );
+  }
+});
+test("space visibility only accepts the supported public/private choices", () => {
+  assert.equal(
+    space.parse({ title: "A", space_type: "General" }).visibility,
+    "Public",
+  );
+  assert.equal(
+    space.parse({ title: "A", space_type: "General", visibility: "Private" })
+      .visibility,
+    "Private",
+  );
+  assert.equal(
+    space.safeParse({ title: "A", space_type: "General", visibility: "Secret" })
+      .success,
+    false,
+  );
+});

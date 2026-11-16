@@ -1,6 +1,6 @@
-import { DataError } from '../components/common/DataError';
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { DataError } from "../components/common/DataError";
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import {
   Bell,
   CheckCheck,
@@ -11,22 +11,24 @@ import {
   Sparkles,
   ArrowRight,
   Inbox,
-} from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
-import { useToast } from '../context/ToastContext';
-import { api } from '../services/api';
-import { NotificationItem } from '../types';
+} from "lucide-react";
+import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
+import { api } from "../services/api";
+import { NotificationItem } from "../types";
 
 interface NotificationsPageProps {
   onRefreshNotifications?: () => void;
 }
 
-export const NotificationsPage: React.FC<NotificationsPageProps> = ({ onRefreshNotifications }) => {
+export const NotificationsPage: React.FC<NotificationsPageProps> = ({
+  onRefreshNotifications,
+}) => {
   const { currentUser } = useAuth();
   const { showToast } = useToast();
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState('');
+  const [loadError, setLoadError] = useState("");
 
   const fetchNotifs = async () => {
     if (!currentUser) return;
@@ -42,12 +44,14 @@ export const NotificationsPage: React.FC<NotificationsPageProps> = ({ onRefreshN
 
   useEffect(() => {
     fetchNotifs();
+    const timer = setInterval(fetchNotifs, 5000);
+    return () => clearInterval(timer);
   }, [currentUser]);
 
   const handleMarkAsRead = async (id: number) => {
     await api.markNotificationAsRead(id);
     setNotifications((prev) =>
-      prev.map((n) => (n.notification_id === id ? { ...n, is_read: true } : n))
+      prev.map((n) => (n.notification_id === id ? { ...n, is_read: true } : n)),
     );
     if (onRefreshNotifications) onRefreshNotifications();
   };
@@ -56,7 +60,7 @@ export const NotificationsPage: React.FC<NotificationsPageProps> = ({ onRefreshN
     if (!currentUser) return;
     await api.markAllNotificationsAsRead(currentUser.user_id);
     setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
-    showToast('All notifications marked as read', 'success');
+    showToast("All notifications marked as read", "success");
     if (onRefreshNotifications) onRefreshNotifications();
   };
 
@@ -64,13 +68,13 @@ export const NotificationsPage: React.FC<NotificationsPageProps> = ({ onRefreshN
 
   const getIcon = (type: string) => {
     switch (type) {
-      case 'reaction':
+      case "reaction":
         return <Heart className="w-4 h-4 text-rose-500" />;
-      case 'comment':
+      case "comment":
         return <MessageCircle className="w-4 h-4 text-indigo-500" />;
-      case 'tag':
+      case "tag":
         return <Tag className="w-4 h-4 text-purple-500" />;
-      case 'capsule':
+      case "capsule":
         return <Clock className="w-4 h-4 text-amber-500" />;
       default:
         return <Bell className="w-4 h-4 text-slate-500" />;
@@ -84,7 +88,9 @@ export const NotificationsPage: React.FC<NotificationsPageProps> = ({ onRefreshN
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">Notifications</h1>
+            <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight">
+              Notifications
+            </h1>
             {unreadCount > 0 && (
               <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-600 text-white">
                 {unreadCount} unread
@@ -92,7 +98,8 @@ export const NotificationsPage: React.FC<NotificationsPageProps> = ({ onRefreshN
             )}
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            Real-time updates on reactions, comments, tags, and unlocked time capsules
+            Real-time updates on reactions, comments, tags, and unlocked time
+            capsules
           </p>
         </div>
 
@@ -111,7 +118,9 @@ export const NotificationsPage: React.FC<NotificationsPageProps> = ({ onRefreshN
       {notifications.length === 0 ? (
         <div className="bg-white rounded-3xl p-12 text-center border border-slate-200">
           <Inbox className="w-10 h-10 text-slate-300 mx-auto mb-2" />
-          <h3 className="font-bold text-slate-900 text-sm">No notifications yet</h3>
+          <h3 className="font-bold text-slate-900 text-sm">
+            No notifications yet
+          </h3>
           <p className="text-xs text-slate-500 mt-1">
             When friends tag you or react to your memories, they'll appear here.
           </p>
@@ -124,8 +133,8 @@ export const NotificationsPage: React.FC<NotificationsPageProps> = ({ onRefreshN
               onClick={() => handleMarkAsRead(n.notification_id)}
               className={`p-4 rounded-2xl border transition flex items-start gap-3.5 cursor-pointer ${
                 !n.is_read
-                  ? 'bg-indigo-50/40 border-indigo-200 hover:bg-indigo-50/70 shadow-2xs'
-                  : 'bg-white border-slate-200 hover:bg-slate-50'
+                  ? "bg-indigo-50/40 border-indigo-200 hover:bg-indigo-50/70 shadow-2xs"
+                  : "bg-white border-slate-200 hover:bg-slate-50"
               }`}
             >
               <div className="w-9 h-9 rounded-xl bg-white border border-slate-200 flex items-center justify-center shrink-0 shadow-2xs mt-0.5">
@@ -134,12 +143,16 @@ export const NotificationsPage: React.FC<NotificationsPageProps> = ({ onRefreshN
 
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-xs font-bold text-slate-900">{n.title}</h4>
+                  <h4 className="text-xs font-bold text-slate-900">
+                    {n.title}
+                  </h4>
                   <span className="text-[10px] text-slate-400">
                     {new Date(n.created_at).toLocaleDateString()}
                   </span>
                 </div>
-                <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">{n.message}</p>
+                <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">
+                  {n.message}
+                </p>
 
                 {n.target_url && (
                   <Link

@@ -33,7 +33,7 @@ CREATE TABLE users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
     full_name VARCHAR(100) NOT NULL,
     email VARCHAR(255) NOT NULL UNIQUE,
-    phone VARCHAR(20) NULL,
+    phone VARCHAR(20) (phone_number REGEXP '^[+]?[0-9]+$') NULL,
     user_type ENUM('STUDENT', 'ALUMNI', 'FACULTY') NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     avatar_url VARCHAR(2048) NULL,

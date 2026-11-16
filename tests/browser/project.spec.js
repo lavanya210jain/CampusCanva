@@ -37,6 +37,11 @@ test("MySQL UI: login, create, upload, refresh, delete, reports and mobile layou
       .click();
     const upload = page.getByRole("dialog", { name: "Add campus memory" });
     await expect(upload.locator("select")).toHaveValue(String(spaceId));
+    const urlInput = upload.locator('input[type="url"]');
+    await urlInput.fill('');
+    // URL imports still require a URL when no local file is selected.
+    await expect(urlInput).toHaveJSProperty('required', true);
+    expect(await urlInput.evaluate(input => input.checkValidity())).toBe(false);
     const png = Buffer.from(
       "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aH0cAAAAASUVORK5CYII=",
       "base64",
@@ -48,6 +53,9 @@ test("MySQL UI: login, create, upload, refresh, delete, reports and mobile layou
         mimeType: "image/png",
         buffer: png,
       });
+    await expect(urlInput).toHaveValue('');
+    await expect(urlInput).toHaveJSProperty('required', false);
+    await expect(urlInput).toBeDisabled();
     await upload
       .getByPlaceholder("Who was there? What was the moment about?")
       .fill("Browser uploaded memory");

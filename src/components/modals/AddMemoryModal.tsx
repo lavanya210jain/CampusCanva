@@ -124,7 +124,7 @@ export const AddMemoryModal: React.FC<AddMemoryModalProps> = ({
       showToast("Please select a memory space", "error");
       return;
     }
-    if (!mediaUrl.trim()) {
+    if ((!file || isMockMode) && !mediaUrl.trim()) {
       showToast("Media URL is required", "error");
       return;
     }
@@ -324,7 +324,7 @@ export const AddMemoryModal: React.FC<AddMemoryModalProps> = ({
           {/* Media URL with Preview */}
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
-              Media File URL *
+              {file && !isMockMode ? "Media URL (not needed for a selected file)" : "Media File URL *"}
             </label>
             <input
               type="url"
@@ -332,7 +332,8 @@ export const AddMemoryModal: React.FC<AddMemoryModalProps> = ({
               value={mediaUrl}
               onChange={(e) => setMediaUrl(e.target.value)}
               className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-hidden focus:bg-white focus:border-indigo-500 transition mb-2"
-              required
+              required={!file || isMockMode}
+              disabled={!!file && !isMockMode}
             />
             {/* Quick Presets */}
             <div className="flex items-center gap-1.5 flex-wrap mb-3">

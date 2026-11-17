@@ -64,11 +64,11 @@ All seeded accounts use password **`CampusCanva123!`**.
 | Faculty | faculty.demo@campuscanva.local | 5 |
 | Alumni | alumni.demo@campuscanva.local | 7 |
 
-All accounts require email and password. Quick evaluator login and persona switching have been removed. Legacy DEMO_LOGIN settings have no effect. Sessions are stored in MySQL; APIs derive the acting user from the session. The SQL Inspector toggle only controls educational UI.
+All accounts require email and password. Quick evaluator login and persona switching have been removed. Legacy DEMO_LOGIN settings have no effect. Sessions are stored in MySQL; APIs derive the acting user from the session. SQL Inspector starts off; enable it to reveal Database Lab. Disabling it hides the page and redirects to Dashboard.
 
 ## Database design
 
-`database/schema.sql` defines 15 tables, two views, foreign keys, composite/unique keys, CHECK constraints, and triggers. `server/setup.ts` creates the schema and loads the realistic TypeScript seed dataset into SQL inside a transaction. Passwords are hashed during seeding.
+`database/schema.sql` defines 16 tables (15 existing application tables plus `app_migration` upgrade bookkeeping), two views, foreign keys, composite/unique keys, CHECK constraints, and triggers. `server/setup.ts` creates the schema and loads the realistic TypeScript seed dataset into SQL inside a transaction. Passwords are hashed during seeding.
 
 Key tables: `users`; user subtypes `student`, `alumni`, `faculty`; `campus_spot`; `memory_space`; `space_member`; `media_item`; media subtypes `photo`, `video`; `media_tag`; `reaction`; weak entity `comment`; `notification`; `app_session`.
 

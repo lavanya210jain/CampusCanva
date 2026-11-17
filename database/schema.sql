@@ -10,6 +10,7 @@ CREATE DATABASE IF NOT EXISTS campuscanva_db CHARACTER SET utf8mb4 COLLATE utf8m
 USE campuscanva_db;
 
 -- Drop tables in reverse order of foreign key dependencies
+DROP TABLE IF EXISTS app_migration;
 DROP TABLE IF EXISTS app_session;
 DROP TABLE IF EXISTS notification;
 DROP TABLE IF EXISTS comment;
@@ -370,3 +371,9 @@ BEGIN
     END IF;
 END //
 DELIMITER ;
+
+-- Upgrade bookkeeping; not part of the campus domain model.
+CREATE TABLE app_migration (
+    migration_id VARCHAR(100) PRIMARY KEY,
+    applied_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;

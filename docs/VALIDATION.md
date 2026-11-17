@@ -35,3 +35,9 @@ Validation: 5 validation tests, 14 MySQL integration tests and 4 browser workflo
 Replaced the static landing feature cards with selectable illustrated previews and real navigation links. Added a forest/cream/terracotta palette, responsive layouts and a stored light/dark preference with system-preference initialization and reduced-motion support. Dark variants cover the main pages, dialogs, inputs, cards, notifications and SQL inspector.
 
 Validation: production build and validation tests passed; all 5 browser workflows passed, including preview selection, system dark initialization, explicit light override, reload/navigation persistence, dark dialogs and mobile overflow. Desktop light/dark landing, dark dashboard and mobile landing screenshots were visually inspected. No database changes are required.
+
+## Inspector opt-in and image defaults — 18 November 2026
+
+Production build and all 5 validation tests passed. All 15 MySQL integration tests passed, including account creation without an avatar and one-time legacy-image cleanup that preserves custom URLs and later user choices. All 7 browser workflows were verified, including hidden/direct-route Database Lab gating, toggling it off while open, mobile navigation, empty profile placeholders and solid themed covers. A transient font/layout measurement was stabilized with a polling assertion; the final focused theme/gating/image checks passed.
+
+Legacy-image migration runs transactionally with a persisted marker under the existing upgrade lock. No uploaded files, user accounts, memberships or memories are deleted.

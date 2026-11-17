@@ -1,3 +1,4 @@
+import { useDemo } from '../context/DemoContext';
 import React, { useState, useEffect } from "react";
 import { Outlet, useNavigate, Navigate, NavLink } from "react-router-dom";
 import { Navbar } from "../components/navigation/Navbar";
@@ -13,6 +14,7 @@ import { CampusSpot, MemorySpace, MediaItem } from "../types";
 export const AppLayout: React.FC = () => {
   const { currentUser, isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
+  const {isDemoMode} = useDemo();
   const [revision, setRevision] = useState(0);
 
   const [spots, setSpots] = useState<CampusSpot[]>([]);
@@ -97,7 +99,7 @@ export const AppLayout: React.FC = () => {
           ["/spots", "Spots"],
           ["/time-capsules", "Capsules"],
           ["/database-lab", "Database Lab"],
-        ].map(([path, label]) => (
+        ].filter(([path])=>path!=='/database-lab'||isDemoMode).map(([path, label]) => (
           <NavLink
             key={path}
             to={path}

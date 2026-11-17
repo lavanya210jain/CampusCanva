@@ -1,47 +1,79 @@
-import React, { useState } from 'react';
-import { ImageOff } from 'lucide-react';
-
+import React, { useState } from "react";
+import { ImageOff, UserRound } from "lucide-react";
 interface ImageWithFallbackProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   fallbackSrc?: string;
+  variant?: "media" | "avatar" | "cover";
 }
-
 export const ImageWithFallback: React.FC<ImageWithFallbackProps> = ({
   src,
-  alt = 'Campus media',
-  className = '',
-  fallbackSrc = 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=800&q=80',
+  alt = "Campus media",
+  className = "",
+  fallbackSrc = "",
+  variant = "media",
+  onLoad,
+  onError,
   ...props
 }) => {
-  const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(true);
-
+  const source = src?.trim() || fallbackSrc;
+  const [failedSource, setFailedSource] = useState<string | null>(null);
+  const [loadedSource, setLoadedSource] = useState<string | null>(null);
+  const missing = !source || failedSource === source;
+  const loading = !missing && loadedSource !== source;
   return (
     <div className={`relative overflow-hidden ${className}`}>
-      {loading && !error && (
-        <div className="absolute inset-0 bg-slate-100 dark:bg-slate-900 animate-pulse flex items-center justify-center">
-          <span className="text-xs text-slate-400">Loading...</span>
-        </div>
-      )}
-
-      {error ? (
-        <div className="w-full h-full min-h-[140px] bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center text-slate-400 p-4 text-center">
-          <ImageOff className="w-6 h-6 mb-1 text-slate-400" />
-          <span className="text-xs text-slate-500 dark:text-slate-400">Image unavailable</span>
-        </div>
+      {missing ? (
+        variant === "avatar" ? (
+          <div
+            role="img"
+            aria-label={`${alt}: no profile photo`}
+            data-testid="avatar-placeholder"
+            className="w-full h-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 dark:text-slate-500"
+          >
+            <UserRound
+              aria-hidden="true"
+              className="w-1/2 h-1/2 max-w-12 max-h-12"
+            />
+          </div>
+        ) : variant === "cover" ? (
+          <div
+            role="img"
+            aria-label={`${alt}: solid forest-green cover`}
+            data-testid="space-cover-placeholder"
+            className="w-full h-full bg-teal-700 dark:bg-teal-900"
+          />
+        ) : (
+          <div
+            role="img"
+            aria-label={`${alt}: image unavailable`}
+            className="w-full h-full bg-slate-100 dark:bg-slate-900 flex flex-col items-center justify-center text-slate-400 p-2 text-center"
+          >
+            <ImageOff className="w-6 h-6 mb-1" />
+            <span className="text-xs">Image unavailable</span>
+          </div>
+        )
       ) : (
-        <img
-          src={src || fallbackSrc}
-          alt={alt}
-          onLoad={() => setLoading(false)}
-          onError={() => {
-            setError(true);
-            setLoading(false);
-          }}
-          className={`w-full h-full object-cover transition-opacity duration-300 ${
-            loading ? 'opacity-0' : 'opacity-100'
-          }`}
-          {...props}
-        />
+        <>
+          {loading && (
+            <div
+              className="absolute inset-0 bg-slate-100 dark:bg-slate-900 animate-pulse"
+              aria-hidden="true"
+            />
+          )}
+          <img
+            {...props}
+            src={source}
+            alt={alt}
+            onLoad={(event) => {
+              setLoadedSource(source);
+              onLoad?.(event);
+            }}
+            onError={(event) => {
+              setFailedSource(source);
+              onError?.(event);
+            }}
+            className={`w-full h-full object-cover transition-opacity duration-300 ${loading ? "opacity-0" : "opacity-100"}`}
+          />
+        </>
       )}
     </div>
   );

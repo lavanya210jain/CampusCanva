@@ -116,6 +116,7 @@ test("user + subtype registration commits together and duplicate subtype rolls b
   data.student.roll_number = `T${Date.now()}`;
   const r = await call(client, "/auth/register", "POST", data);
   assert.equal(r.status, 201, JSON.stringify(r.body));
+  assert.equal(r.body.avatar_url, "");
   assert.equal((await call(client, "/auth/me")).body.user_id, r.body.user_id);
   const [stored] = await rows(
     "SELECT password_hash FROM users WHERE user_id=?",
@@ -670,12 +671,68 @@ test("repeated database upgrades preserve existing spaces, memberships and media
   }
 });
 
+test("legacy quick-login cannot create a session even with an old enabled environment flag", async () => {
+  process.env.DEMO_LOGIN = "true";
+  for (const userId of [1, 5, 7]) {
+    const client = {};
+    assert.equal(
+      (await call(client, "/auth/demo", "POST", { userId })).status,
+      404,
+    );
+    assert.equal((await call(client, "/auth/me")).status, 401);
+  }
+});
 
-test('legacy quick-login cannot create a session even with an old enabled environment flag',async()=>{
-  process.env.DEMO_LOGIN='true';
-  for(const userId of [1,5,7]) {
-    const client={};
-    assert.equal((await call(client,'/auth/demo','POST',{userId})).status,404);
-    assert.equal((await call(client,'/auth/me')).status,401);
+test("legacy image cleanup is one-time and preserves custom profile photos and covers", async () => {
+  const { legacyAvatars, legacyAutoCover } =
+    await import("../../server/legacyImages.js");
+  const original = (await call(student, "/auth/me")).body.avatar_url;
+  const originalFaculty = (await call(faculty, "/auth/me")).body.avatar_url;
+  const auto = await createSpace({ cover_url: legacyAutoCover });
+  const custom = await createSpace({
+    cover_url: "https://example.edu/my-custom-cover.jpg",
+  });
+  try {
+    await rows("UPDATE users SET avatar_url=? WHERE user_id=1", [
+      legacyAvatars[0],
+    ]);
+    await rows(
+      "UPDATE users SET avatar_url='https://example.edu/my-profile.jpg' WHERE user_id=5",
+    );
+    await rows(
+      "DELETE FROM app_migration WHERE migration_id='remove_automatic_images_v1'",
+    );
+    await migrate();
+    assert.equal((await call(student, "/auth/me")).body.avatar_url, "");
+    assert.equal(
+      (await call(faculty, "/auth/me")).body.avatar_url,
+      "https://example.edu/my-profile.jpg",
+    );
+    assert.equal(
+      (await call(student, `/spaces/${auto.space_id}`)).body.cover_url,
+      "",
+    );
+    assert.equal(
+      (await call(student, `/spaces/${custom.space_id}`)).body.cover_url,
+      "https://example.edu/my-custom-cover.jpg",
+    );
+    // A user may intentionally choose an old stock URL after the upgrade; do not erase it again.
+    await rows("UPDATE users SET avatar_url=? WHERE user_id=1", [
+      legacyAvatars[0],
+    ]);
+    await migrate();
+    assert.equal(
+      (await call(student, "/auth/me")).body.avatar_url,
+      legacyAvatars[0],
+    );
+  } finally {
+    await rows("UPDATE users SET avatar_url=? WHERE user_id=1", [
+      original || "",
+    ]);
+    await rows("UPDATE users SET avatar_url=? WHERE user_id=5", [
+      originalFaculty || "",
+    ]);
+    await call(student, `/spaces/${auto.space_id}`, "DELETE");
+    await call(student, `/spaces/${custom.space_id}`, "DELETE");
   }
 });

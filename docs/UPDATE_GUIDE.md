@@ -80,3 +80,20 @@ The landing page now has illustrated, clickable previews for spaces, capsules an
 Use the moon/sun button in the welcome header, authentication pages or app navbar to switch themes. The initial theme follows the device's colour preference until you choose one. A choice is saved in the browser and survives navigation and reloads. This changes appearance only; it does not change data mode, permissions or database content. Reduced-motion preferences disable decorative motion.
 
 Apply this update using the ZIP/copy steps above, preserving `.env` and `server/uploads`. If the earlier database update is already installed, this visual update needs no additional database migration.
+
+## SQL Inspector visibility and empty-photo defaults
+
+SQL Inspector now starts off. Database Lab appears in the desktop/mobile navigation only after you enable the SQL Inspector button. Turning it off redirects an open Lab page to Dashboard, hides the link and closes the inspector drawer. Directly opening `/database-lab` while it is off also returns to Dashboard. This is a display mode, not an additional user role or restriction on privileged direct MySQL access.
+
+New accounts have no assigned profile photograph. A neutral empty-avatar symbol is used until a user supplies a photo. New spaces start with no cover URL and display a solid forest-green cover matching the light/dark theme. Optional custom cover URLs still work. Missing or broken images never trigger a random stock-photo fallback.
+
+The upgrade clears recognized automatically assigned stock profile images and old default covers once. It preserves uploaded files and custom URLs. The `app_migration` bookkeeping table records the cleanup so subsequent restarts do not repeat it or undo later image choices. There are now 16 tables in the schema: the existing 15 plus this small bookkeeping table.
+
+After updating project files and preserving `.env` and `server/uploads`, run:
+
+```powershell
+npm.cmd run db:upgrade
+npm.cmd run dev
+```
+
+The API also applies the upgrade automatically on startup. Do not run `db:reset`; it would replace your saved data with the original sample dataset.

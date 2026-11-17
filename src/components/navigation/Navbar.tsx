@@ -35,7 +35,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCreateModal, unreadCount =
 
   return (
     <header className="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2 sm:gap-4">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-2 sm:gap-4">
         {/* Left: Brand Logo */}
         <Link to="/dashboard" className="flex items-center gap-2 sm:gap-3 shrink-0 group">
           <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-teal-600 via-teal-700 to-orange-600 flex items-center justify-center text-white shadow-md shadow-teal-100 dark:shadow-black/10 group-hover:scale-105 transition-transform">
@@ -71,8 +71,10 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCreateModal, unreadCount =
           <ThemeToggle />
           {/* SQL Inspector Toggle */}
           <button
+            aria-label="SQL Inspector"
+            aria-pressed={isDemoMode}
             onClick={toggleDemoMode}
-            className={`hidden sm:flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-xl text-xs font-semibold transition border ${
+            className={`flex items-center gap-1.5 px-2 sm:px-3 py-1.5 rounded-xl text-xs font-semibold transition border ${
               isDemoMode
                 ? 'bg-emerald-50 dark:bg-emerald-950 border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300'
                 : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900'
@@ -110,8 +112,8 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCreateModal, unreadCount =
               onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
               className="flex items-center gap-2 p-1 rounded-full hover:ring-2 hover:ring-teal-100 dark:hover:ring-teal-800 transition"
             >
-              <ImageWithFallback
-                src={currentUser?.avatar_url}
+              <ImageWithFallback variant="avatar"
+                    src={currentUser?.avatar_url}
                 alt={currentUser?.full_name || 'User'}
                 className="w-9 h-9 rounded-full ring-1 ring-slate-200 dark:ring-slate-800"
               />

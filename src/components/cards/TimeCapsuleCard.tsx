@@ -61,8 +61,8 @@ export const TimeCapsuleCard: React.FC<TimeCapsuleCardProps> = ({ space, spot, m
       <div>
         {/* Cover with Frosted Lock Effect */}
         <div className="relative aspect-16/9 overflow-hidden bg-slate-900">
-          <ImageWithFallback
-            src={space.cover_url}
+          <ImageWithFallback variant="cover"
+                    src={space.cover_url}
             alt={space.title}
             className={`w-full h-full object-cover transition-all duration-500 ${
               !isUnlocked ? 'filter blur-md brightness-50 scale-105' : 'filter brightness-95'

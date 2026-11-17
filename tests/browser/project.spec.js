@@ -78,7 +78,10 @@ test("MySQL UI: login, create, upload, refresh, delete, reports and mobile layou
     await expect(page.getByAltText("Browser uploaded memory")).toHaveCount(0);
     const media = await page.request.get(`/api/spaces/${spaceId}/media`);
     expect(await media.json()).toHaveLength(0);
-    await page.goto("/database-lab");
+    await page
+      .getByRole("button", { name: "SQL Inspector", exact: true })
+      .click();
+    await page.getByRole("link", { name: "Database Lab", exact: true }).click();
     await expect(page.locator("section")).toHaveCount(4);
     await page.locator("summary").first().click();
     await expect(page.locator("pre").first()).toContainText(
@@ -86,7 +89,15 @@ test("MySQL UI: login, create, upload, refresh, delete, reports and mobile layou
     );
     await page.setViewportSize({ width: 390, height: 844 });
     for (const route of ["/dashboard", "/explore", "/database-lab"]) {
-      await page.goto(route);
+      if (route === "/database-lab") {
+        await page.goto("/dashboard");
+        await page
+          .getByRole("button", { name: "SQL Inspector", exact: true })
+          .click();
+        await page
+          .getByRole("link", { name: "Database Lab", exact: true })
+          .click();
+      } else await page.goto(route);
       await expect(page.locator("h1")).toBeVisible();
       expect(
         await page.evaluate(
@@ -338,15 +349,140 @@ test("feature previews respond to selection and theme persists across public and
     "/profile",
     "/database-lab",
   ]) {
-    await page.goto(path);
+    if (path === "/database-lab") {
+      await page.goto("/dashboard");
+      await page
+        .getByRole("button", { name: "SQL Inspector", exact: true })
+        .click();
+      await page
+        .getByRole("link", { name: "Database Lab", exact: true })
+        .click();
+    } else await page.goto(path);
     await expect(page.locator("h1")).toBeVisible();
-    expect(
-      await page.evaluate(
-        () => document.documentElement.scrollWidth <= innerWidth,
-      ),
-    ).toBe(true);
+    await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), {message:`No horizontal overflow on ${path}`}).toBe(true);
     await expect(
       page.getByRole("button", { name: "Switch to light mode", exact: true }),
     ).toBeVisible();
+  }
+});
+
+test("Database Lab is opt-in and direct navigation cannot bypass the inspector toggle", async ({
+  page,
+}) => {
+  let reportRequests = 0;
+  page.on("request", (request) => {
+    if (new URL(request.url()).pathname === "/api/reports") reportRequests++;
+  });
+  await page.goto("/login");
+  await page
+    .locator('input[type="email"]')
+    .fill("student.demo@campuscanva.local");
+  await page.locator('input[type="password"]').fill("CampusCanva123!");
+  await page.getByRole("button", { name: "Sign In", exact: true }).click();
+  await expect(page).toHaveURL(/\/dashboard$/);
+  await expect(
+    page.getByRole("button", { name: "SQL Inspector", exact: true }),
+  ).toHaveAttribute("aria-pressed", "false");
+  await expect(
+    page.getByRole("link", { name: "Database Lab", exact: true }),
+  ).toHaveCount(0);
+  await page.goto("/database-lab");
+  await expect(page).toHaveURL(/\/dashboard$/);
+  expect(reportRequests).toBe(0);
+  await page
+    .getByRole("button", { name: "SQL Inspector", exact: true })
+    .click();
+  await page.getByRole("link", { name: "Database Lab", exact: true }).click();
+  await expect(page).toHaveURL(/\/database-lab$/);
+  await expect(page.locator("section")).toHaveCount(4);
+  await page
+    .getByRole("button", { name: "SQL Inspector", exact: true })
+    .click();
+  await expect(page).toHaveURL(/\/dashboard$/);
+  await expect(
+    page.getByRole("link", { name: "Database Lab", exact: true }),
+  ).toHaveCount(0);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page
+    .getByRole("button", { name: "SQL Inspector", exact: true })
+    .click();
+  await expect(
+    page
+      .getByRole("navigation", { name: "Mobile navigation" })
+      .getByRole("link", { name: "Database Lab", exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "SQL Inspector", exact: true })
+    .click();
+  await expect(
+    page.getByRole("link", { name: "Database Lab", exact: true }),
+  ).toHaveCount(0);
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+});
+
+test("missing profile photos stay blank and new spaces use a solid themed cover", async ({
+  page,
+}) => {
+  await page.goto("/login");
+  await page
+    .locator('input[type="email"]')
+    .fill("student.demo@campuscanva.local");
+  await page.locator('input[type="password"]').fill("CampusCanva123!");
+  await page.getByRole("button", { name: "Sign In", exact: true }).click();
+  await expect(page).toHaveURL(/\/dashboard$/);
+  const user = await (await page.request.get("/api/auth/me")).json();
+  // Clear only this test account's image and restore its previous choice on completion.
+  await page.request.patch(`/api/users/${user.user_id}`, {
+    data: { avatar_url: "" },
+  });
+  let spaceId;
+  try {
+    await page.goto("/profile");
+    await expect(page.getByTestId("avatar-placeholder")).toHaveCount(2);
+    await expect(page.locator("img")).toHaveCount(0);
+    await page.getByRole("button", { name: "New Space", exact: true }).click();
+    const dialog = page.getByRole("dialog", { name: "Create memory space" });
+    await expect(dialog.locator('input[type="url"]')).toHaveValue("");
+    await expect(
+      dialog.getByRole("img", { name: "Default forest-green cover preview" }),
+    ).toBeVisible();
+    await dialog
+      .getByPlaceholder("e.g. Moksha 2026, Manali Trip, Batch of 2025")
+      .fill(`Solid cover ${Date.now()}`);
+    await dialog
+      .getByRole("button", { name: "Create Space", exact: true })
+      .click();
+    await expect(page).toHaveURL(/\/spaces\/\d+$/);
+    spaceId = Number(new URL(page.url()).pathname.split("/").at(-1));
+    expect(
+      (await (await page.request.get(`/api/spaces/${spaceId}`)).json())
+        .cover_url,
+    ).toBe("");
+    const cover = page.getByTestId("space-cover-placeholder");
+    await expect(cover).toBeVisible();
+    await expect(cover.locator("img")).toHaveCount(0);
+    await expect(
+      page.getByText("Image unavailable", { exact: true }),
+    ).toHaveCount(0);
+    const light = await cover.evaluate(
+      (element) => getComputedStyle(element).backgroundColor,
+    );
+    await page
+      .getByRole("button", { name: "Switch to dark mode", exact: true })
+      .click();
+    expect(
+      await cover.evaluate(
+        (element) => getComputedStyle(element).backgroundColor,
+      ),
+    ).not.toBe(light);
+  } finally {
+    await page.request.patch(`/api/users/${user.user_id}`, {
+      data: { avatar_url: user.avatar_url || "" },
+    });
+    if (spaceId) await page.request.delete(`/api/spaces/${spaceId}`);
   }
 });

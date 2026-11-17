@@ -244,8 +244,8 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
       <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xs">
         {/* Cover Image */}
         <div className="relative h-64 sm:h-80 w-full overflow-hidden bg-slate-900">
-          <ImageWithFallback
-            src={space.cover_url}
+          <ImageWithFallback variant="cover"
+                    src={space.cover_url}
             alt={space.title}
             className={`w-full h-full object-cover ${isLocked ? "filter blur-xs brightness-75" : ""}`}
           />
@@ -302,8 +302,8 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
         {/* Space Action Toolbar */}
         <div className="p-5 sm:p-6 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <ImageWithFallback
-              src={creator?.avatar_url}
+            <ImageWithFallback variant="avatar"
+                    src={creator?.avatar_url}
               alt={creator?.full_name || "Creator"}
               className="w-11 h-11 rounded-full ring-2 ring-teal-100 dark:ring-teal-800"
             />
@@ -614,7 +614,7 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
                 className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800"
               >
                 <div className="flex items-center gap-3">
-                  <ImageWithFallback
+                  <ImageWithFallback variant="avatar"
                     src={m.user.avatar_url}
                     alt={m.user.full_name}
                     className="w-10 h-10 rounded-full shrink-0"

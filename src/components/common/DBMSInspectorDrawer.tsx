@@ -4,10 +4,10 @@ import { Database, Key, GitFork, Code2, X, ShieldCheck } from 'lucide-react';
 import { useDemo } from '../../context/DemoContext';
 
 export const DBMSInspectorDrawer: React.FC = () => {
-  const { inspectorData, closeInspector } = useDemo();
+  const { inspectorData, closeInspector, isDemoMode } = useDemo();
 
-  const dialogRef = useDialog(!!inspectorData, closeInspector);
-  if (!inspectorData) return null;
+  const dialogRef = useDialog(!!inspectorData && isDemoMode, closeInspector);
+  if (!inspectorData || !isDemoMode) return null;
 
   return (
     <div ref={dialogRef} role="dialog" aria-modal="true" aria-label="DBMS Schema Inspector" className="fixed inset-0 z-[60] flex justify-end bg-slate-900/30 backdrop-blur-xs transition-opacity animate-fade-in">

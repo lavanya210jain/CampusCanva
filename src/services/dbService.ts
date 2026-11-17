@@ -225,7 +225,7 @@ class RelationalDatabaseService {
       title: data.title,
       description: data.description,
       space_type: data.space_type,
-      cover_url: data.cover_url || 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1000&q=80',
+      cover_url: data.cover_url || '',
       visibility: data.visibility || 'Public',
       is_time_locked: data.is_time_locked,
       unlock_date: data.is_time_locked ? data.unlock_date : null,

@@ -1,3 +1,8 @@
+import {
+  legacyAvatars,
+  legacySeedCovers,
+  legacyAutoCover,
+} from "./legacyImages.js";
 import { pool, rows } from "./db.js";
 import { normalizePhone, phoneIsValid } from "../shared/phone.js";
 
@@ -59,6 +64,51 @@ export async function migrate() {
       await db.query(
         "ALTER TABLE users ADD CONSTRAINT chk_user_phone CHECK (phone IS NULL OR phone='' OR phone REGEXP '^[6-9][0-9]{9}$')",
       );
+    await db.query(`CREATE TABLE IF NOT EXISTS app_migration (
+      migration_id VARCHAR(100) PRIMARY KEY,
+      applied_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB`);
+    const cleanupId = "remove_automatic_images_v1";
+    if (
+      !(
+        await rows(
+          "SELECT 1 FROM app_migration WHERE migration_id=?",
+          [cleanupId],
+          db,
+        )
+      ).length
+    ) {
+      await db.beginTransaction();
+      try {
+        // Only recognized defaults are cleared, once. Uploads and custom URLs remain intact.
+        for (const url of legacyAvatars)
+          await rows(
+            "UPDATE users SET avatar_url='' WHERE avatar_url=?",
+            [url],
+            db,
+          );
+        for (const [id, url] of legacySeedCovers)
+          await rows(
+            "UPDATE memory_space SET cover_url='' WHERE space_id=? AND cover_url=?",
+            [id, url],
+            db,
+          );
+        await rows(
+          "UPDATE memory_space SET cover_url='' WHERE cover_url=?",
+          [legacyAutoCover],
+          db,
+        );
+        await rows(
+          "INSERT INTO app_migration(migration_id) VALUES(?)",
+          [cleanupId],
+          db,
+        );
+        await db.commit();
+      } catch (error) {
+        await db.rollback();
+        throw error;
+      }
+    }
     // Rename only original untouched demo identities; preserve customized accounts.
     for (const [id, oldName, newName] of [
       [1, "Kavya Gupta", "Demo Student"],

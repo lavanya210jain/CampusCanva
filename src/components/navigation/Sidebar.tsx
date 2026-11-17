@@ -47,7 +47,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ unreadCount = 0 }) => {
             <div className="px-3 pb-2 text-[11px] font-bold uppercase tracking-wider text-slate-400">
               Menu
             </div>
-            {navItems.map((item) => {
+            {navItems.filter(item => item.path !== '/database-lab' || isDemoMode).map((item) => {
               const Icon = item.icon;
               return (
                 <NavLink

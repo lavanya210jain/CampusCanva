@@ -112,13 +112,7 @@ export const RegisterPage: React.FC = () => {
           phone: phone.trim() || undefined,
           user_type: userType,
           password,
-          avatar_url: `https://images.unsplash.com/photo-${
-            userType === "STUDENT"
-              ? "1534528741775-53994a69daeb"
-              : userType === "FACULTY"
-                ? "1472099645785-5658abf4ff4e"
-                : "1500648767791-00dcc994a43e"
-          }?auto=format&fit=crop&w=300&q=80`,
+          avatar_url: '',
         },
         specializedData,
       );

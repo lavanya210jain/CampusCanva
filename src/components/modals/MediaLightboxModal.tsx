@@ -176,8 +176,8 @@ export const MediaLightboxModal: React.FC<MediaLightboxModalProps> = ({
           {/* Header */}
           <div className="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <ImageWithFallback
-                src={uploader?.avatar_url}
+              <ImageWithFallback variant="avatar"
+                    src={uploader?.avatar_url}
                 alt={uploader?.full_name || 'Uploader'}
                 className="w-10 h-10 rounded-full ring-1 ring-slate-200 dark:ring-slate-800"
               />
@@ -273,8 +273,8 @@ export const MediaLightboxModal: React.FC<MediaLightboxModalProps> = ({
                       key={c.comment_no}
                       className="group flex items-start gap-2.5 text-xs bg-slate-50/70 dark:bg-slate-950/70 p-2.5 rounded-xl border border-slate-100/80 dark:border-slate-800/80"
                     >
-                      <ImageWithFallback
-                        src={c.user?.avatar_url}
+                      <ImageWithFallback variant="avatar"
+                    src={c.user?.avatar_url}
                         alt={c.user?.full_name}
                         className="w-7 h-7 rounded-full shrink-0"
                       />

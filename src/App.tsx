@@ -3,7 +3,7 @@ import { DatabaseLabPage } from './pages/DatabaseLabPage';
 import { BrowserRouter, Routes, Route, Navigate, useOutletContext } from 'react-router-dom';
 import { ToastProvider } from './context/ToastContext';
 import { AuthProvider } from './context/AuthContext';
-import { DemoProvider } from './context/DemoContext';
+import { DemoProvider, useDemo } from './context/DemoContext';
 import { AppLayout } from './layouts/AppLayout';
 import { WelcomeLanding } from './pages/WelcomeLanding';
 import { LoginPage } from './pages/LoginPage';
@@ -25,6 +25,11 @@ interface LayoutContextType {
   onOpenMediaLightbox: (media: MediaItem) => void;
   onRefreshNotifications: () => void;
 }
+
+const DatabaseLabRoute: React.FC = () => {
+  const { isDemoMode } = useDemo();
+  return isDemoMode ? <DatabaseLabPage /> : <Navigate to="/dashboard" replace />;
+};
 
 // Wrapper Pages to bind outlet context
 const DashboardRoute: React.FC = () => {
@@ -86,7 +91,7 @@ export const App: React.FC = () => {
 
               {/* Main App Layout */}
               <Route element={<AppLayout />}>
-                <Route path="/database-lab" element={<DatabaseLabPage />} />
+                <Route path="/database-lab" element={<DatabaseLabRoute />} />
                 <Route path="/dashboard" element={<DashboardRoute />} />
                 <Route path="/explore" element={<ExploreRoute />} />
                 <Route path="/spaces/:id" element={<SpaceDetailRoute />} />

@@ -13,29 +13,6 @@ interface CreateSpaceModalProps {
   onSpaceCreated: (newSpace: MemorySpace) => void;
 }
 
-const PRESET_COVERS = [
-  {
-    label: "Campus Fest",
-    url: "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1000&q=80",
-  },
-  {
-    label: "College Lawn",
-    url: "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1000&q=80",
-  },
-  {
-    label: "Tech Hackathon",
-    url: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1000&q=80",
-  },
-  {
-    label: "Admin Heritage",
-    url: "https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=1000&q=80",
-  },
-  {
-    label: "Cafe & Chai",
-    url: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=1000&q=80",
-  },
-];
-
 export const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
   isOpen,
   onClose,
@@ -49,7 +26,7 @@ export const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
   const [description, setDescription] = useState("");
   const [spaceType, setSpaceType] = useState<SpaceType>("Event");
   const [spotId, setSpotId] = useState<number | null>(null);
-  const [coverUrl, setCoverUrl] = useState(PRESET_COVERS[0].url);
+  const [coverUrl, setCoverUrl] = useState("");
   const [visibility, setVisibility] = useState<"Public" | "Private">("Public");
   const [isTimeLocked, setIsTimeLocked] = useState(false);
   const [unlockDate, setUnlockDate] = useState("");
@@ -263,25 +240,17 @@ export const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
                 className="flex-1 px-3.5 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-slate-100 focus:outline-hidden focus:bg-white dark:focus:bg-slate-900 focus:border-teal-500 transition"
               />
             </div>
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="text-[10px] text-slate-400 font-semibold uppercase">
-                Quick Pick:
-              </span>
-              {PRESET_COVERS.map((preset, idx) => (
-                <button
-                  type="button"
-                  key={idx}
-                  onClick={() => setCoverUrl(preset.url)}
-                  className={`text-[11px] px-2.5 py-1 rounded-lg border transition ${
-                    coverUrl === preset.url
-                      ? "bg-teal-50 dark:bg-teal-950 border-teal-300 dark:border-teal-700 text-teal-700 dark:text-teal-300 font-semibold"
-                      : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-950"
-                  }`}
-                >
-                  {preset.label}
-                </button>
-              ))}
-            </div>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Leave this empty for a solid forest-green cover that matches the
+              app.
+            </p>
+            {!coverUrl.trim() && (
+              <div
+                role="img"
+                aria-label="Default forest-green cover preview"
+                className="h-16 rounded-xl bg-teal-700 dark:bg-teal-900"
+              />
+            )}
           </div>
 
           {/* Time Capsule Toggle Box */}

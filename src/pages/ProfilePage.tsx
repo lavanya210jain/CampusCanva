@@ -79,7 +79,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
     setEditName(currentUser.full_name);
     setEditBio(currentUser.bio || "");
     setEditPhone(currentUser.phone || "");
-    setEditAvatar(currentUser.avatar_url);
+    setEditAvatar(currentUser.avatar_url || '');
     setAvatarFile(undefined);
     setIsEditOpen(true);
   };
@@ -129,8 +129,8 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({
         <div className="px-6 sm:px-10 pb-8 relative pt-0">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 -mt-16 sm:-mt-20 mb-6">
             <div className="flex flex-col sm:flex-row sm:items-end gap-5">
-              <ImageWithFallback
-                src={currentUser.avatar_url}
+              <ImageWithFallback variant="avatar"
+                    src={currentUser.avatar_url}
                 alt={currentUser.full_name}
                 className="w-28 h-28 sm:w-36 sm:h-36 rounded-3xl object-cover ring-4 ring-white dark:ring-slate-900 shadow-xl bg-white dark:bg-slate-900"
               />

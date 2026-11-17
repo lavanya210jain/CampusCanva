@@ -17,7 +17,7 @@ export function PhoneInput({
     <div>
       <label
         htmlFor={id}
-        className="block text-xs font-semibold uppercase text-slate-600 mb-1"
+        className="block text-xs font-semibold uppercase text-slate-600 dark:text-slate-300 mb-1"
       >
         Phone number (optional)
       </label>
@@ -37,9 +37,9 @@ export function PhoneInput({
         }}
         aria-describedby={`${id}-help`}
         placeholder="9876543210 or +91 9876543210"
-        className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm"
+        className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm"
       />
-      <p id={`${id}-help`} className="text-xs text-slate-500 mt-1">
+      <p id={`${id}-help`} className="text-xs text-slate-500 dark:text-slate-400 mt-1">
         10 digits starting with 6–9; +91 is optional.
       </p>
     </div>

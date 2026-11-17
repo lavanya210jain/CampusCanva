@@ -57,7 +57,7 @@ export const TimeCapsuleCard: React.FC<TimeCapsuleCardProps> = ({ space, spot, m
   const isUnlocked = timeLeft.isPast;
 
   return (
-    <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between">
+    <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xs hover:shadow-xl transition-all duration-300 flex flex-col justify-between">
       <div>
         {/* Cover with Frosted Lock Effect */}
         <div className="relative aspect-16/9 overflow-hidden bg-slate-900">
@@ -89,7 +89,7 @@ export const TimeCapsuleCard: React.FC<TimeCapsuleCardProps> = ({ space, spot, m
           {/* Centered Message & Lock Visual */}
           {!isUnlocked ? (
             <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center">
-              <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 flex items-center justify-center text-white mb-2 shadow-lg animate-pulse">
+              <div className="w-12 h-12 rounded-2xl bg-white/20 dark:bg-slate-900/20 backdrop-blur-md border border-white/30 dark:border-slate-900/30 flex items-center justify-center text-white mb-2 shadow-lg animate-pulse">
                 <Lock className="w-6 h-6" />
               </div>
               <p className="text-xs font-medium text-white/90 drop-shadow-sm max-w-xs">
@@ -106,36 +106,36 @@ export const TimeCapsuleCard: React.FC<TimeCapsuleCardProps> = ({ space, spot, m
 
         {/* Content */}
         <div className="p-6">
-          <h3 className="font-bold text-lg text-slate-900 leading-snug">{space.title}</h3>
-          <p className="text-xs text-slate-500 mt-2 line-clamp-2 leading-relaxed">{space.description}</p>
+          <h3 className="font-bold text-lg text-slate-900 dark:text-slate-100 leading-snug">{space.title}</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 line-clamp-2 leading-relaxed">{space.description}</p>
 
           {/* Real-time Ticking Countdown / Status Box */}
-          <div className="mt-5 p-4 rounded-2xl bg-slate-50 border border-slate-200">
+          <div className="mt-5 p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800">
             {!isUnlocked ? (
               <div>
                 <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2 flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5 text-amber-500" />
+                  <Clock className="w-3.5 h-3.5 text-amber-500 dark:text-amber-400" />
                   <span>Countdown to Unlock</span>
                 </div>
                 <div className="grid grid-cols-4 gap-2 text-center">
-                  <div className="bg-white p-2 rounded-xl border border-slate-200 shadow-2xs">
-                    <div className="text-lg font-black text-slate-900 font-mono">{timeLeft.days}</div>
+                  <div className="bg-white dark:bg-slate-900 p-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs">
+                    <div className="text-lg font-black text-slate-900 dark:text-slate-100 font-mono">{timeLeft.days}</div>
                     <div className="text-[10px] text-slate-400 font-medium">Days</div>
                   </div>
-                  <div className="bg-white p-2 rounded-xl border border-slate-200 shadow-2xs">
-                    <div className="text-lg font-black text-slate-900 font-mono">
+                  <div className="bg-white dark:bg-slate-900 p-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs">
+                    <div className="text-lg font-black text-slate-900 dark:text-slate-100 font-mono">
                       {String(timeLeft.hours).padStart(2, '0')}
                     </div>
                     <div className="text-[10px] text-slate-400 font-medium">Hours</div>
                   </div>
-                  <div className="bg-white p-2 rounded-xl border border-slate-200 shadow-2xs">
-                    <div className="text-lg font-black text-slate-900 font-mono">
+                  <div className="bg-white dark:bg-slate-900 p-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs">
+                    <div className="text-lg font-black text-slate-900 dark:text-slate-100 font-mono">
                       {String(timeLeft.minutes).padStart(2, '0')}
                     </div>
                     <div className="text-[10px] text-slate-400 font-medium">Mins</div>
                   </div>
-                  <div className="bg-white p-2 rounded-xl border border-slate-200 shadow-2xs">
-                    <div className="text-lg font-black text-amber-600 font-mono">
+                  <div className="bg-white dark:bg-slate-900 p-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs">
+                    <div className="text-lg font-black text-amber-600 dark:text-amber-300 font-mono">
                       {String(timeLeft.seconds).padStart(2, '0')}
                     </div>
                     <div className="text-[10px] text-slate-400 font-medium">Secs</div>
@@ -144,26 +144,26 @@ export const TimeCapsuleCard: React.FC<TimeCapsuleCardProps> = ({ space, spot, m
               </div>
             ) : (
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
+                <div className="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 flex items-center justify-center font-bold">
                   🎉
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-slate-900">Capsule Opened!</div>
-                  <div className="text-[11px] text-slate-500">
+                  <div className="text-xs font-bold text-slate-900 dark:text-slate-100">Capsule Opened!</div>
+                  <div className="text-[11px] text-slate-500 dark:text-slate-400">
                     All {mediaCount} campus archives and memories are unlocked for viewing.
                   </div>
                 </div>
               </div>
             )}
 
-            <div className="mt-3 pt-2.5 border-t border-slate-200/80 flex items-center justify-between text-[11px] text-slate-500">
+            <div className="mt-3 pt-2.5 border-t border-slate-200/80 dark:border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
               <span className="flex items-center gap-1">
                 <Calendar className="w-3 h-3 text-slate-400" />
                 <span>
                   Unlock Date: {space.unlock_date ? new Date(space.unlock_date).toLocaleDateString() : 'N/A'}
                 </span>
               </span>
-              {spot && <span className="font-semibold text-indigo-600">{spot.spot_name}</span>}
+              {spot && <span className="font-semibold text-teal-600 dark:text-teal-300">{spot.spot_name}</span>}
             </div>
           </div>
         </div>
@@ -175,7 +175,7 @@ export const TimeCapsuleCard: React.FC<TimeCapsuleCardProps> = ({ space, spot, m
           <Link
             to={`/spaces/${space.space_id}`}
             onClick={triggerConfetti}
-            className="w-full flex items-center justify-center gap-2 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition shadow-xs shadow-emerald-100"
+            className="w-full flex items-center justify-center gap-2 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition shadow-xs shadow-emerald-100 dark:shadow-black/10"
           >
             <span>Open Unlocked Memory Gallery</span>
             <ArrowRight className="w-4 h-4" />
@@ -183,7 +183,7 @@ export const TimeCapsuleCard: React.FC<TimeCapsuleCardProps> = ({ space, spot, m
         ) : (
           <Link
             to={`/spaces/${space.space_id}`}
-            className="w-full flex items-center justify-center gap-2 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition"
+            className="w-full flex items-center justify-center gap-2 py-3 bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-bold transition"
           >
             <Lock className="w-3.5 h-3.5 text-slate-400" />
             <span>View Vault Details</span>

@@ -46,21 +46,21 @@ export const MySpacesPage: React.FC<MySpacesPageProps> = ({ onOpenCreateModal })
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold mb-2">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-teal-50 dark:bg-teal-950 border border-teal-200 dark:border-teal-800 text-teal-700 dark:text-teal-300 text-xs font-bold mb-2">
             <FolderHeart className="w-3.5 h-3.5" />
             <span>M:N Relation (space_member)</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
             My Memory Spaces
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1 max-w-xl">
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-xl">
             Collaborative spaces where you are an Admin, Contributor, or Viewer.
           </p>
         </div>
 
         <button
           onClick={onOpenCreateModal}
-          className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition shadow-xs self-start sm:self-auto"
+          className="flex items-center gap-2 px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold transition shadow-xs self-start sm:self-auto"
         >
           <PlusCircle className="w-4 h-4" />
           <span>Create New Space</span>
@@ -68,15 +68,15 @@ export const MySpacesPage: React.FC<MySpacesPageProps> = ({ onOpenCreateModal })
       </div>
 
       {userSpaces.length === 0 ? (
-        <div className="bg-white rounded-3xl p-12 text-center border border-slate-200">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl p-12 text-center border border-slate-200 dark:border-slate-800">
           <FolderHeart className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-          <h3 className="font-bold text-slate-900 text-base">You haven't joined any spaces yet</h3>
-          <p className="text-xs text-slate-500 mt-1 mb-4">
+          <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">You haven't joined any spaces yet</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 mb-4">
             Create your first memory space or browse explore page to join existing college spaces.
           </p>
           <button
             onClick={onOpenCreateModal}
-            className="px-5 py-2.5 bg-indigo-600 text-white text-xs font-bold rounded-xl hover:bg-indigo-700 transition"
+            className="px-5 py-2.5 bg-teal-600 text-white text-xs font-bold rounded-xl hover:bg-teal-700 transition"
           >
             Create Memory Space
           </button>

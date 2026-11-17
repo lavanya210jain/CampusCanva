@@ -29,3 +29,9 @@ See UPDATE_GUIDE.md for Windows ZIP updates that retain .env, uploaded files and
 Removed evaluator cards from welcome/login, the navbar account switcher and the shared switch-user action. The old /api/auth/demo endpoint now rejects requests even with DEMO_LOGIN=true in an existing environment. Normal login fields start empty. Seeded accounts and saved memories remain intact; sign in with their email and password.
 
 Validation: 5 validation tests, 14 MySQL integration tests and 4 browser workflows passed. Browser assertions cover absent evaluator controls, blank credential fields, absent account switching and rejected passwordless login. Production build passed. No database migration is needed for this removal.
+
+## Visual design and theme update — 17 November 2026
+
+Replaced the static landing feature cards with selectable illustrated previews and real navigation links. Added a forest/cream/terracotta palette, responsive layouts and a stored light/dark preference with system-preference initialization and reduced-motion support. Dark variants cover the main pages, dialogs, inputs, cards, notifications and SQL inspector.
+
+Validation: production build and validation tests passed; all 5 browser workflows passed, including preview selection, system dark initialization, explicit light override, reload/navigation persistence, dark dialogs and mobile overflow. Desktop light/dark landing, dark dashboard and mobile landing screenshots were visually inspected. No database changes are required.

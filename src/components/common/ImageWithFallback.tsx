@@ -18,15 +18,15 @@ export const ImageWithFallback: React.FC<ImageWithFallbackProps> = ({
   return (
     <div className={`relative overflow-hidden ${className}`}>
       {loading && !error && (
-        <div className="absolute inset-0 bg-slate-100 animate-pulse flex items-center justify-center">
+        <div className="absolute inset-0 bg-slate-100 dark:bg-slate-900 animate-pulse flex items-center justify-center">
           <span className="text-xs text-slate-400">Loading...</span>
         </div>
       )}
 
       {error ? (
-        <div className="w-full h-full min-h-[140px] bg-slate-100 border border-slate-200 flex flex-col items-center justify-center text-slate-400 p-4 text-center">
+        <div className="w-full h-full min-h-[140px] bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center text-slate-400 p-4 text-center">
           <ImageOff className="w-6 h-6 mb-1 text-slate-400" />
-          <span className="text-xs text-slate-500">Image unavailable</span>
+          <span className="text-xs text-slate-500 dark:text-slate-400">Image unavailable</span>
         </div>
       ) : (
         <img

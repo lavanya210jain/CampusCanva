@@ -127,24 +127,24 @@ export const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
       aria-label="Create memory space"
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-fade-in overflow-y-auto"
     >
-      <div className="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl border border-slate-100 my-8">
-        <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl border border-slate-100 dark:border-slate-800 my-8">
+        <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-2xl bg-teal-50 dark:bg-teal-950 text-teal-600 dark:text-teal-300 flex items-center justify-center">
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-slate-900">
+              <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">
                 Create Memory Space
               </h2>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Collaborative archive for college experiences
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-slate-600 rounded-xl transition"
+            className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-xl transition"
           >
             <X className="w-5 h-5" />
           </button>
@@ -164,7 +164,7 @@ export const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
               onChange={(e) =>
                 setVisibility(e.target.value as "Public" | "Private")
               }
-              className="w-full border border-slate-200 rounded-xl p-2"
+              className="w-full border border-slate-200 dark:border-slate-800 rounded-xl p-2"
             >
               <option value="Public">
                 Public — all signed-in campus users
@@ -173,14 +173,14 @@ export const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
                 Private — only members added by an Admin
               </option>
             </select>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
               Admins can change this later under About. Private spaces are
               hidden from other users.
             </p>
           </div>
           {/* Title */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
               Space Title *
             </label>
             <input
@@ -189,13 +189,13 @@ export const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
-              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:outline-hidden focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition"
+              className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm text-slate-900 dark:text-slate-100 focus:outline-hidden focus:bg-white dark:focus:bg-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-100 dark:focus:ring-teal-800 transition"
             />
           </div>
 
           {/* Description */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
               Description
             </label>
             <textarea
@@ -203,20 +203,20 @@ export const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
               placeholder="What makes this campus moment special?"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:outline-hidden focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition resize-none"
+              className="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm text-slate-900 dark:text-slate-100 focus:outline-hidden focus:bg-white dark:focus:bg-slate-900 focus:border-teal-500 focus:ring-2 focus:ring-teal-100 dark:focus:ring-teal-800 transition resize-none"
             />
           </div>
 
           {/* Space Type & Campus Spot */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
                 Space Type *
               </label>
               <select
                 value={spaceType}
                 onChange={(e) => setSpaceType(e.target.value as SpaceType)}
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:outline-hidden focus:bg-white focus:border-indigo-500 transition"
+                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm text-slate-900 dark:text-slate-100 focus:outline-hidden focus:bg-white dark:focus:bg-slate-900 focus:border-teal-500 transition"
               >
                 <option value="Event">Event (Fest / Hackathon)</option>
                 <option value="Batch">Batch (Class Chronicle)</option>
@@ -227,7 +227,7 @@ export const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
             </div>
 
             <div>
-              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
                 Campus Spot (Location)
               </label>
               <select
@@ -237,7 +237,7 @@ export const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
                     e.target.value ? parseInt(e.target.value, 10) : null,
                   )
                 }
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:outline-hidden focus:bg-white focus:border-indigo-500 transition"
+                className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm text-slate-900 dark:text-slate-100 focus:outline-hidden focus:bg-white dark:focus:bg-slate-900 focus:border-teal-500 transition"
               >
                 <option value="">None / Off-Campus</option>
                 {spots.map((spot) => (
@@ -251,7 +251,7 @@ export const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
 
           {/* Cover Image Preset Selector */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
               Cover Image URL
             </label>
             <div className="flex gap-2 mb-2">
@@ -260,7 +260,7 @@ export const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
                 value={coverUrl}
                 onChange={(e) => setCoverUrl(e.target.value)}
                 placeholder="https://..."
-                className="flex-1 px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-hidden focus:bg-white focus:border-indigo-500 transition"
+                className="flex-1 px-3.5 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-slate-100 focus:outline-hidden focus:bg-white dark:focus:bg-slate-900 focus:border-teal-500 transition"
               />
             </div>
             <div className="flex items-center gap-1.5 flex-wrap">
@@ -274,8 +274,8 @@ export const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
                   onClick={() => setCoverUrl(preset.url)}
                   className={`text-[11px] px-2.5 py-1 rounded-lg border transition ${
                     coverUrl === preset.url
-                      ? "bg-indigo-50 border-indigo-300 text-indigo-700 font-semibold"
-                      : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                      ? "bg-teal-50 dark:bg-teal-950 border-teal-300 dark:border-teal-700 text-teal-700 dark:text-teal-300 font-semibold"
+                      : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-950"
                   }`}
                 >
                   {preset.label}
@@ -285,17 +285,17 @@ export const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
           </div>
 
           {/* Time Capsule Toggle Box */}
-          <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 to-purple-500/10 border border-amber-200/80">
+          <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-200/80 dark:border-amber-800/80">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <div className="p-1.5 rounded-lg bg-amber-500 text-white">
                   <Lock className="w-4 h-4" />
                 </div>
                 <div>
-                  <span className="text-sm font-bold text-slate-900">
+                  <span className="text-sm font-bold text-slate-900 dark:text-slate-100">
                     Enable Time Capsule Feature
                   </span>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
                     Lock memories until a designated future reveal date
                   </p>
                 </div>
@@ -307,23 +307,23 @@ export const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
                   onChange={(e) => setIsTimeLocked(e.target.checked)}
                   className="sr-only peer"
                 />
-                <div className="w-11 h-6 bg-slate-200 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+                <div className="w-11 h-6 bg-slate-200 dark:bg-slate-800 peer-focus:outline-hidden rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white dark:peer-checked:after:border-slate-900 after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white dark:after:bg-slate-900 after:border-slate-300 dark:after:border-slate-700 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
               </label>
             </div>
 
             {isTimeLocked && (
-              <div className="mt-3 pt-3 border-t border-amber-200/60 animate-fade-in">
-                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1">
+              <div className="mt-3 pt-3 border-t border-amber-200/60 dark:border-amber-800/60 animate-fade-in">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 dark:text-slate-200 mb-1">
                   Reveal / Unlock Date & Time *
                 </label>
                 <input
                   type="datetime-local"
                   value={unlockDate}
                   onChange={(e) => setUnlockDate(e.target.value)}
-                  className="w-full px-3.5 py-2 bg-white border border-amber-300 rounded-xl text-xs text-slate-900 focus:outline-hidden focus:border-amber-500 transition"
+                  className="w-full px-3.5 py-2 bg-white dark:bg-slate-900 border border-amber-300 dark:border-amber-700 rounded-xl text-xs text-slate-900 dark:text-slate-100 focus:outline-hidden focus:border-amber-500 transition"
                   required={isTimeLocked}
                 />
-                <p className="text-[11px] text-amber-800 mt-1">
+                <p className="text-[11px] text-amber-800 dark:text-amber-200 mt-1">
                   * Evaluators: Sets a conditional unlock constraint in the
                   database.
                 </p>
@@ -336,14 +336,14 @@ export const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2.5 text-sm font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-xl transition"
+              className="px-5 py-2.5 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-900 rounded-xl transition"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={submitting}
-              className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl shadow-md shadow-indigo-100 transition disabled:opacity-50"
+              className="px-6 py-2.5 bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold rounded-xl shadow-md shadow-teal-100 dark:shadow-black/10 transition disabled:opacity-50"
             >
               {submitting ? "Creating..." : "Create Space"}
             </button>

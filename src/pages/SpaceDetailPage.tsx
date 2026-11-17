@@ -147,7 +147,7 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
 
   if (loadError)
     return (
-      <div role="alert" className="p-6 text-rose-700">
+      <div role="alert" className="p-6 text-rose-700 dark:text-rose-300">
         {loadError}{" "}
         <button className="underline" onClick={() => window.location.reload()}>
           Retry
@@ -157,8 +157,8 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
   if (loading || !space) {
     return (
       <div className="py-20 text-center">
-        <div className="w-8 h-8 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-        <p className="text-xs text-slate-500">Loading memory space...</p>
+        <div className="w-8 h-8 border-3 border-teal-600 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
+        <p className="text-xs text-slate-500 dark:text-slate-400">Loading memory space...</p>
       </div>
     );
   }
@@ -223,7 +223,7 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
       <div className="flex items-center justify-between">
         <Link
           to="/explore"
-          className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-slate-900 transition"
+          className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Back to All Spaces</span>
@@ -232,7 +232,7 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
         {isDemoMode && (
           <button
             onClick={() => openInspector("space", space.space_id)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold transition hover:bg-indigo-100"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-teal-50 dark:bg-teal-950 border border-teal-200 dark:border-teal-800 text-teal-700 dark:text-teal-300 text-xs font-bold transition hover:bg-teal-100 dark:hover:bg-teal-900"
           >
             <Database className="w-3.5 h-3.5" />
             <span>Inspect MEMORY_SPACE Schema</span>
@@ -241,7 +241,7 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
       </div>
 
       {/* Hero Header Card */}
-      <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-xs">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xs">
         {/* Cover Image */}
         <div className="relative h-64 sm:h-80 w-full overflow-hidden bg-slate-900">
           <ImageWithFallback
@@ -253,7 +253,7 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
 
           {/* Badges Overlay */}
           <div className="absolute top-4 left-4 flex flex-wrap items-center gap-2">
-            <span className="px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider bg-white/90 text-slate-900 backdrop-blur-md shadow-xs">
+            <span className="px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider bg-white/90 dark:bg-slate-900/90 text-slate-900 dark:text-slate-100 backdrop-blur-md shadow-xs">
               {space.space_type}
             </span>
 
@@ -281,7 +281,7 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
             <div className="flex flex-wrap items-center gap-4 text-xs sm:text-sm text-white/90 mt-2 font-medium">
               {spot && (
                 <span className="flex items-center gap-1.5">
-                  <MapPin className="w-4 h-4 text-indigo-300" />
+                  <MapPin className="w-4 h-4 text-teal-300" />
                   <span>{spot.spot_name}</span>
                 </span>
               )}
@@ -300,24 +300,24 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
         </div>
 
         {/* Space Action Toolbar */}
-        <div className="p-5 sm:p-6 bg-white border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="p-5 sm:p-6 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <ImageWithFallback
               src={creator?.avatar_url}
               alt={creator?.full_name || "Creator"}
-              className="w-11 h-11 rounded-full ring-2 ring-indigo-100"
+              className="w-11 h-11 rounded-full ring-2 ring-teal-100 dark:ring-teal-800"
             />
             <div>
               <div className="text-xs text-slate-400 font-medium">
                 Space Creator
               </div>
-              <div className="text-sm font-bold text-slate-900">
+              <div className="text-sm font-bold text-slate-900 dark:text-slate-100">
                 {creator?.full_name}
               </div>
             </div>
 
             {userRole && (
-              <span className="ml-2 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-indigo-50 text-indigo-700 border border-indigo-100">
+              <span className="ml-2 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-teal-50 dark:bg-teal-950 text-teal-700 dark:text-teal-300 border border-teal-100 dark:border-teal-800">
                 Your Role: {userRole}
               </span>
             )}
@@ -327,7 +327,7 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
             {!userMembership ? (
               <button
                 onClick={() => handleJoinSpace("Contributor")}
-                className="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-xs transition"
+                className="flex items-center gap-1.5 px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold shadow-xs transition"
               >
                 <UserPlus className="w-4 h-4" />
                 <span>Join Space</span>
@@ -336,7 +336,7 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
               !isAdmin && (
                 <button
                   onClick={handleLeaveSpace}
-                  className="flex items-center gap-1.5 px-3 py-2 bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-600 rounded-xl text-xs font-bold transition"
+                  className="flex items-center gap-1.5 px-3 py-2 bg-slate-100 dark:bg-slate-900 hover:bg-rose-50 dark:hover:bg-rose-950 hover:text-rose-600 dark:hover:text-rose-300 text-slate-600 dark:text-slate-300 rounded-xl text-xs font-bold transition"
                 >
                   <LogOut className="w-4 h-4" />
                   <span>Leave</span>
@@ -347,7 +347,7 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
             {isContributor && (
               <button
                 onClick={() => onOpenAddMemory(space.space_id)}
-                className="flex items-center gap-1.5 px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl text-xs font-bold transition border border-indigo-200"
+                className="flex items-center gap-1.5 px-4 py-2 bg-teal-50 dark:bg-teal-950 hover:bg-teal-100 dark:hover:bg-teal-900 text-teal-700 dark:text-teal-300 rounded-xl text-xs font-bold transition border border-teal-200 dark:border-teal-800"
               >
                 <PlusCircle className="w-4 h-4" />
                 <span>Add Memory</span>
@@ -357,7 +357,7 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
             {isAdmin && (
               <button
                 onClick={() => setShowDeleteConfirm(true)}
-                className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition"
+                className="p-2 text-slate-400 hover:text-rose-600 dark:hover:text-rose-300 hover:bg-rose-50 dark:hover:bg-rose-950 rounded-xl transition"
                 title="Delete Space"
               >
                 <Trash2 className="w-4 h-4" />
@@ -367,13 +367,13 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
         </div>
 
         {/* Tab Navigation */}
-        <div className="px-6 flex items-center gap-8 border-b border-slate-100 text-xs font-bold uppercase tracking-wider">
+        <div className="px-6 flex items-center gap-8 border-b border-slate-100 dark:border-slate-800 text-xs font-bold uppercase tracking-wider">
           <button
             onClick={() => setActiveTab("memories")}
             className={`py-3.5 border-b-2 transition flex items-center gap-2 ${
               activeTab === "memories"
-                ? "border-indigo-600 text-indigo-600"
-                : "border-transparent text-slate-400 hover:text-slate-700"
+                ? "border-teal-600 text-teal-600 dark:text-teal-300"
+                : "border-transparent text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
             }`}
           >
             <ImageIcon className="w-4 h-4" />
@@ -384,8 +384,8 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
             onClick={() => setActiveTab("members")}
             className={`py-3.5 border-b-2 transition flex items-center gap-2 ${
               activeTab === "members"
-                ? "border-indigo-600 text-indigo-600"
-                : "border-transparent text-slate-400 hover:text-slate-700"
+                ? "border-teal-600 text-teal-600 dark:text-teal-300"
+                : "border-transparent text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
             }`}
           >
             <Users className="w-4 h-4" />
@@ -396,8 +396,8 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
             onClick={() => setActiveTab("about")}
             className={`py-3.5 border-b-2 transition flex items-center gap-2 ${
               activeTab === "about"
-                ? "border-indigo-600 text-indigo-600"
-                : "border-transparent text-slate-400 hover:text-slate-700"
+                ? "border-teal-600 text-teal-600 dark:text-teal-300"
+                : "border-transparent text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
             }`}
           >
             <Shield className="w-4 h-4" />
@@ -411,14 +411,14 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
         <div>
           {isLocked ? (
             /* Time Locked Vault Screen */
-            <div className="bg-white rounded-3xl p-10 sm:p-14 border border-slate-200 text-center shadow-xs max-w-2xl mx-auto">
-              <div className="w-16 h-16 rounded-3xl bg-amber-500/10 text-amber-600 border border-amber-200 flex items-center justify-center mx-auto mb-4 animate-pulse">
+            <div className="bg-white dark:bg-slate-900 rounded-3xl p-10 sm:p-14 border border-slate-200 dark:border-slate-800 text-center shadow-xs max-w-2xl mx-auto">
+              <div className="w-16 h-16 rounded-3xl bg-amber-500/10 text-amber-600 dark:text-amber-300 border border-amber-200 dark:border-amber-800 flex items-center justify-center mx-auto mb-4 animate-pulse">
                 <Lock className="w-8 h-8" />
               </div>
-              <h2 className="text-xl font-bold text-slate-900">
+              <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">
                 "This memory is waiting for its moment."
               </h2>
-              <p className="text-xs text-slate-500 mt-2 max-w-md mx-auto leading-relaxed">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-2 max-w-md mx-auto leading-relaxed">
                 This memory space is locked as a future time capsule. All
                 photos, clips, and messages will automatically unlock and reveal
                 themselves when the countdown hits zero.
@@ -426,32 +426,32 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
 
               {/* Countdown Clock */}
               <div className="mt-8 grid grid-cols-4 gap-3 max-w-sm mx-auto">
-                <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200">
-                  <div className="text-2xl font-black text-slate-900 font-mono">
+                <div className="bg-slate-50 dark:bg-slate-950 p-3 rounded-2xl border border-slate-200 dark:border-slate-800">
+                  <div className="text-2xl font-black text-slate-900 dark:text-slate-100 font-mono">
                     {timeLeft.days}
                   </div>
                   <div className="text-[10px] text-slate-400 uppercase font-bold mt-1">
                     Days
                   </div>
                 </div>
-                <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200">
-                  <div className="text-2xl font-black text-slate-900 font-mono">
+                <div className="bg-slate-50 dark:bg-slate-950 p-3 rounded-2xl border border-slate-200 dark:border-slate-800">
+                  <div className="text-2xl font-black text-slate-900 dark:text-slate-100 font-mono">
                     {String(timeLeft.hours).padStart(2, "0")}
                   </div>
                   <div className="text-[10px] text-slate-400 uppercase font-bold mt-1">
                     Hours
                   </div>
                 </div>
-                <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200">
-                  <div className="text-2xl font-black text-slate-900 font-mono">
+                <div className="bg-slate-50 dark:bg-slate-950 p-3 rounded-2xl border border-slate-200 dark:border-slate-800">
+                  <div className="text-2xl font-black text-slate-900 dark:text-slate-100 font-mono">
                     {String(timeLeft.minutes).padStart(2, "0")}
                   </div>
                   <div className="text-[10px] text-slate-400 uppercase font-bold mt-1">
                     Mins
                   </div>
                 </div>
-                <div className="bg-slate-50 p-3 rounded-2xl border border-slate-200">
-                  <div className="text-2xl font-black text-amber-600 font-mono">
+                <div className="bg-slate-50 dark:bg-slate-950 p-3 rounded-2xl border border-slate-200 dark:border-slate-800">
+                  <div className="text-2xl font-black text-amber-600 dark:text-amber-300 font-mono">
                     {String(timeLeft.seconds).padStart(2, "0")}
                   </div>
                   <div className="text-[10px] text-slate-400 uppercase font-bold mt-1">
@@ -465,20 +465,20 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
               </div>
             </div>
           ) : mediaList.length === 0 ? (
-            <div className="bg-white rounded-3xl p-12 text-center border border-slate-200">
-              <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto mb-3">
+            <div className="bg-white dark:bg-slate-900 rounded-3xl p-12 text-center border border-slate-200 dark:border-slate-800">
+              <div className="w-12 h-12 rounded-2xl bg-teal-50 dark:bg-teal-950 text-teal-600 dark:text-teal-300 flex items-center justify-center mx-auto mb-3">
                 <ImageIcon className="w-6 h-6" />
               </div>
-              <h3 className="font-bold text-slate-900 text-base">
+              <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">
                 No memories uploaded yet
               </h3>
-              <p className="text-xs text-slate-500 mt-1">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                 Be the first to add a photograph or video to this space!
               </p>
               {isContributor && (
                 <button
                   onClick={() => onOpenAddMemory(space.space_id)}
-                  className="mt-4 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition"
+                  className="mt-4 px-4 py-2 bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold rounded-xl transition"
                 >
                   Upload First Memory
                 </button>
@@ -510,7 +510,7 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
                       {m.caption}
                     </p>
                     <div className="flex items-center justify-between mt-2 text-[10px] text-slate-300">
-                      <span className="uppercase font-bold text-indigo-300">
+                      <span className="uppercase font-bold text-teal-300">
                         {m.media_type}
                       </span>
                       <span>
@@ -533,13 +533,13 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
 
       {/* Tab: Members */}
       {activeTab === "members" && (
-        <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-xs">
-          <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-4">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 shadow-xs">
+          <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800 mb-4">
             <div>
-              <h3 className="text-base font-bold text-slate-900">
+              <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
                 Space Community & Roles
               </h3>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 M:N Relation resolved via space_member
               </p>
             </div>
@@ -601,7 +601,7 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
               </select>
               <button
                 disabled={saving || !newMemberId}
-                className="rounded-xl bg-indigo-600 text-white p-2 text-sm disabled:opacity-50"
+                className="rounded-xl bg-teal-600 text-white p-2 text-sm disabled:opacity-50"
               >
                 Add member
               </button>
@@ -611,7 +611,7 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
             {members.map((m) => (
               <div
                 key={m.user_id}
-                className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 border border-slate-100"
+                className="flex items-center justify-between p-3 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-100 dark:border-slate-800"
               >
                 <div className="flex items-center gap-3">
                   <ImageWithFallback
@@ -620,7 +620,7 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
                     className="w-10 h-10 rounded-full shrink-0"
                   />
                   <div>
-                    <div className="text-xs font-bold text-slate-900">
+                    <div className="text-xs font-bold text-slate-900 dark:text-slate-100">
                       {m.user.full_name}
                     </div>
                     <div className="text-[10px] text-slate-400 uppercase tracking-wider">
@@ -664,7 +664,7 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
                     <button
                       title={`Remove ${m.user.full_name}`}
                       disabled={saving}
-                      className="text-rose-600 p-1"
+                      className="text-rose-600 dark:text-rose-300 p-1"
                       onClick={async () => {
                         if (
                           !confirm(
@@ -695,10 +695,10 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
                   <span
                     className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
                       m.role_type === "Admin"
-                        ? "bg-purple-100 text-purple-700"
+                        ? "bg-orange-100 dark:bg-orange-900 text-orange-700 dark:text-orange-300"
                         : m.role_type === "Contributor"
-                          ? "bg-indigo-100 text-indigo-700"
-                          : "bg-slate-200 text-slate-700"
+                          ? "bg-teal-100 dark:bg-teal-900 text-teal-700 dark:text-teal-300"
+                          : "bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200"
                     }`}
                   >
                     {m.role_type}
@@ -712,20 +712,20 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
 
       {/* Tab: About */}
       {activeTab === "about" && (
-        <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-xs space-y-6">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 shadow-xs space-y-6">
           <div>
-            <h3 className="text-base font-bold text-slate-900 mb-2">
+            <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 mb-2">
               About This Memory Space
             </h3>
-            <p className="text-sm text-slate-600 leading-relaxed">
-              <span className="block mb-2 font-semibold text-indigo-700">
+            <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+              <span className="block mb-2 font-semibold text-teal-700 dark:text-teal-300">
                 Visibility: {space.visibility || "Public"}
               </span>
               {space.description}
             </p>
             {isAdmin && (
               <button
-                className="mt-3 text-sm font-semibold text-indigo-600"
+                className="mt-3 text-sm font-semibold text-teal-600 dark:text-teal-300"
                 onClick={() => {
                   setEditVisibility(space.visibility || "Public");
                   setEditTitle(space.title);
@@ -794,7 +794,7 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
                 />
                 <button
                   disabled={saving}
-                  className="rounded-xl bg-indigo-600 text-white p-2 text-sm"
+                  className="rounded-xl bg-teal-600 text-white p-2 text-sm"
                 >
                   Save changes
                 </button>
@@ -803,23 +803,23 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
           </div>
 
           {spot && (
-            <div className="p-4 rounded-2xl bg-indigo-50/50 border border-indigo-100">
-              <div className="flex items-center gap-2 mb-2 text-indigo-950 font-bold text-sm">
-                <MapPin className="w-4 h-4 text-indigo-600" />
+            <div className="p-4 rounded-2xl bg-teal-50/50 dark:bg-teal-950/50 border border-teal-100 dark:border-teal-800">
+              <div className="flex items-center gap-2 mb-2 text-teal-950 dark:text-teal-200 font-bold text-sm">
+                <MapPin className="w-4 h-4 text-teal-600 dark:text-teal-300" />
                 <span>Associated Campus Landmark: {spot.spot_name}</span>
               </div>
-              <p className="text-xs text-slate-600 leading-relaxed">
+              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                 {spot.description}
               </p>
             </div>
           )}
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-slate-100 text-xs">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-slate-100 dark:border-slate-800 text-xs">
             <div>
               <span className="text-slate-400 font-semibold block">
                 Primary Key (PK)
               </span>
-              <span className="font-mono text-slate-800 font-bold">
+              <span className="font-mono text-slate-800 dark:text-slate-100 font-bold">
                 space_id = {space.space_id}
               </span>
             </div>
@@ -827,7 +827,7 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
               <span className="text-slate-400 font-semibold block">
                 Creator Foreign Key
               </span>
-              <span className="font-mono text-slate-800 font-bold">
+              <span className="font-mono text-slate-800 dark:text-slate-100 font-bold">
                 creator_id = {space.creator_id}
               </span>
             </div>
@@ -835,7 +835,7 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
               <span className="text-slate-400 font-semibold block">
                 Spot Foreign Key
               </span>
-              <span className="font-mono text-slate-800 font-bold">
+              <span className="font-mono text-slate-800 dark:text-slate-100 font-bold">
                 spot_id = {space.spot_id || "NULL"}
               </span>
             </div>
@@ -843,7 +843,7 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
               <span className="text-slate-400 font-semibold block">
                 Time Lock Constraint
               </span>
-              <span className="font-mono text-slate-800 font-bold">
+              <span className="font-mono text-slate-800 dark:text-slate-100 font-bold">
                 {space.is_time_locked ? "TRUE (CHECK chk_timelock)" : "FALSE"}
               </span>
             </div>

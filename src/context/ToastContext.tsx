@@ -41,21 +41,21 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             key={toast.id}
             className={`pointer-events-auto flex items-start gap-3 p-4 rounded-xl shadow-lg border backdrop-blur-md transition-all duration-300 animate-slide-up ${
               toast.type === 'success'
-                ? 'bg-emerald-50/95 border-emerald-200 text-emerald-900'
+                ? 'bg-emerald-50/95 dark:bg-emerald-950/95 border-emerald-200 dark:border-emerald-800 text-emerald-900 dark:text-emerald-200'
                 : toast.type === 'error'
-                ? 'bg-rose-50/95 border-rose-200 text-rose-900'
-                : 'bg-indigo-50/95 border-indigo-200 text-indigo-900'
+                ? 'bg-rose-50/95 dark:bg-rose-950/95 border-rose-200 dark:border-rose-800 text-rose-900 dark:text-rose-200'
+                : 'bg-teal-50/95 dark:bg-teal-950/95 border-teal-200 dark:border-teal-800 text-teal-900 dark:text-teal-200'
             }`}
           >
-            {toast.type === 'success' && <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />}
-            {toast.type === 'error' && <AlertCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />}
-            {toast.type === 'info' && <Info className="w-5 h-5 text-indigo-600 shrink-0 mt-0.5" />}
+            {toast.type === 'success' && <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-300 shrink-0 mt-0.5" />}
+            {toast.type === 'error' && <AlertCircle className="w-5 h-5 text-rose-600 dark:text-rose-300 shrink-0 mt-0.5" />}
+            {toast.type === 'info' && <Info className="w-5 h-5 text-teal-600 dark:text-teal-300 shrink-0 mt-0.5" />}
 
             <div className="flex-1 text-sm font-medium">{toast.message}</div>
 
             <button
               onClick={() => removeToast(toast.id)}
-              className="text-slate-400 hover:text-slate-600 p-0.5 rounded transition"
+              className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 p-0.5 rounded transition"
             >
               <X className="w-4 h-4" />
             </button>

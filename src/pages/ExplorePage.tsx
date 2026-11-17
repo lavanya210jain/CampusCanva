@@ -164,22 +164,22 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({ onOpenMediaLightbox })
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
             Explore Campus Archives
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
             Browse through memories, fests, batches, and locations across NSUT
           </p>
         </div>
 
         {/* View Mode Toggle: Spaces vs Direct Media */}
-        <div className="flex items-center bg-slate-100 p-1 rounded-2xl border border-slate-200 self-start sm:self-auto">
+        <div className="flex items-center bg-slate-100 dark:bg-slate-900 p-1 rounded-2xl border border-slate-200 dark:border-slate-800 self-start sm:self-auto">
           <button
             onClick={() => setViewMode('spaces')}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold transition ${
               viewMode === 'spaces'
-                ? 'bg-white text-indigo-700 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white dark:bg-slate-900 text-teal-700 dark:text-teal-300 shadow-xs'
+                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100'
             }`}
           >
             <Grid className="w-3.5 h-3.5" />
@@ -189,8 +189,8 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({ onOpenMediaLightbox })
             onClick={() => setViewMode('media')}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-bold transition ${
               viewMode === 'media'
-                ? 'bg-white text-indigo-700 shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white dark:bg-slate-900 text-teal-700 dark:text-teal-300 shadow-xs'
+                : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100'
             }`}
           >
             <ImageIcon className="w-3.5 h-3.5" />
@@ -200,7 +200,7 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({ onOpenMediaLightbox })
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="bg-white p-4 sm:p-5 rounded-3xl border border-slate-200 shadow-xs space-y-4">
+      <div className="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
         <div className="flex flex-col md:flex-row items-center gap-3">
           {/* Search Input */}
           <div className="relative flex-1 w-full">
@@ -210,7 +210,7 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({ onOpenMediaLightbox })
               placeholder="Search by title, description, or caption..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-hidden focus:bg-white focus:border-indigo-500 transition"
+              className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:outline-hidden focus:bg-white dark:focus:bg-slate-900 focus:border-teal-500 transition"
             />
           </div>
 
@@ -220,7 +220,7 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({ onOpenMediaLightbox })
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as 'newest' | 'oldest' | 'popular')}
-              className="w-full md:w-auto px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-hidden focus:bg-white focus:border-indigo-500 transition"
+              className="w-full md:w-auto px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 focus:outline-hidden focus:bg-white dark:focus:bg-slate-900 focus:border-teal-500 transition"
             >
               <option value="newest">Sort: Newest First</option>
               <option value="oldest">Sort: Oldest First</option>
@@ -230,9 +230,9 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({ onOpenMediaLightbox })
         </div>
 
         {/* Filters Row */}
-        <div className="flex flex-wrap items-center gap-2.5 pt-2 border-t border-slate-100">
+        <div className="flex flex-wrap items-center gap-2.5 pt-2 border-t border-slate-100 dark:border-slate-800">
           <span className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1">
-            <Filter className="w-3 h-3 text-indigo-600" />
+            <Filter className="w-3 h-3 text-teal-600 dark:text-teal-300" />
             <span>Filters:</span>
           </span>
 
@@ -240,7 +240,7 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({ onOpenMediaLightbox })
           <select
             value={selectedSpotId ?? ''}
             onChange={(e) => setSelectedSpotId(e.target.value ? parseInt(e.target.value, 10) : null)}
-            className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-700"
+            className="px-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-medium text-slate-700 dark:text-slate-200"
           >
             <option value="">All Campus Spots</option>
             {spots.map((s) => (
@@ -254,7 +254,7 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({ onOpenMediaLightbox })
           <select
             value={selectedType}
             onChange={(e) => setSelectedType(e.target.value)}
-            className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-700"
+            className="px-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-medium text-slate-700 dark:text-slate-200"
           >
             <option value="ALL">All Space Types</option>
             <option value="Event">Event</option>
@@ -268,7 +268,7 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({ onOpenMediaLightbox })
           <select
             value={selectedCreatorId}
             onChange={(e) => setSelectedCreatorId(e.target.value)}
-            className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-700"
+            className="px-3 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-medium text-slate-700 dark:text-slate-200"
           >
             <option value="ALL">All Creators</option>
             {users.map((u) => (
@@ -282,7 +282,7 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({ onOpenMediaLightbox })
           {hasActiveFilters && (
             <button
               onClick={clearFilters}
-              className="text-xs font-bold text-rose-600 hover:text-rose-700 underline px-2 py-1"
+              className="text-xs font-bold text-rose-600 dark:text-rose-300 hover:text-rose-700 dark:hover:text-rose-300 underline px-2 py-1"
             >
               Reset Filters
             </button>
@@ -293,17 +293,17 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({ onOpenMediaLightbox })
       {/* Gallery Render */}
       {viewMode === 'spaces' ? (
         filteredSpaces.length === 0 ? (
-          <div className="bg-white rounded-3xl p-12 text-center border border-slate-200">
-            <div className="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl p-12 text-center border border-slate-200 dark:border-slate-800">
+            <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-900 text-slate-400 flex items-center justify-center mx-auto mb-3">
               <Inbox className="w-6 h-6" />
             </div>
-            <h3 className="font-bold text-slate-900 text-base">No memory spaces match your criteria</h3>
-            <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+            <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">No memory spaces match your criteria</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-sm mx-auto">
               Try adjusting your search query, spot selector, or resetting active filters.
             </p>
             <button
               onClick={clearFilters}
-              className="mt-4 px-4 py-2 bg-indigo-50 text-indigo-700 text-xs font-bold rounded-xl hover:bg-indigo-100 transition"
+              className="mt-4 px-4 py-2 bg-teal-50 dark:bg-teal-950 text-teal-700 dark:text-teal-300 text-xs font-bold rounded-xl hover:bg-teal-100 dark:hover:bg-teal-900 transition"
             >
               Clear All Filters
             </button>
@@ -328,12 +328,12 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({ onOpenMediaLightbox })
       ) : (
         /* Media Direct View */
         filteredMedia.length === 0 ? (
-          <div className="bg-white rounded-3xl p-12 text-center border border-slate-200">
-            <div className="w-12 h-12 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-3">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl p-12 text-center border border-slate-200 dark:border-slate-800">
+            <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-900 text-slate-400 flex items-center justify-center mx-auto mb-3">
               <Inbox className="w-6 h-6" />
             </div>
-            <h3 className="font-bold text-slate-900 text-base">No media items found</h3>
-            <p className="text-xs text-slate-500 mt-1">Try another search keyword or filter.</p>
+            <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">No media items found</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Try another search keyword or filter.</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -348,7 +348,7 @@ export const ExplorePage: React.FC<ExplorePageProps> = ({ onOpenMediaLightbox })
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-3 flex flex-col justify-end">
                   <p className="text-xs font-medium text-white line-clamp-2">{m.caption}</p>
                   <div className="flex items-center justify-between mt-2 text-[10px] text-slate-300">
-                    <span className="uppercase font-bold text-indigo-300">{m.media_type}</span>
+                    <span className="uppercase font-bold text-teal-300">{m.media_type}</span>
                     <span>{new Date(m.uploaded_at).toLocaleDateString()}</span>
                   </div>
                 </div>

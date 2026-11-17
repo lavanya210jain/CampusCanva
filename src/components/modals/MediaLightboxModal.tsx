@@ -140,7 +140,7 @@ export const MediaLightboxModal: React.FC<MediaLightboxModalProps> = ({
 
   return (
     <div ref={dialogRef} role="dialog" aria-modal="true" aria-label="Campus memory" className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in">
-      <div className="bg-white rounded-3xl max-w-5xl w-full max-h-[92vh] overflow-hidden shadow-2xl border border-slate-800 flex flex-col md:flex-row">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-5xl w-full max-h-[92vh] overflow-hidden shadow-2xl border border-slate-800 flex flex-col md:flex-row">
         {/* Left: Media Viewport */}
         <div className="md:w-3/5 bg-slate-950 flex flex-col items-center justify-center relative min-h-[300px] md:min-h-[560px]">
           {media.media_type === 'PHOTO' ? (
@@ -162,31 +162,31 @@ export const MediaLightboxModal: React.FC<MediaLightboxModalProps> = ({
           {isDemoMode && (
             <button
               onClick={() => openInspector('media', media.media_id)}
-              className="absolute bottom-4 left-4 z-10 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-900 text-indigo-300 border border-indigo-500/30 text-xs backdrop-blur-md transition"
+              className="absolute bottom-4 left-4 z-10 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-900 text-teal-300 border border-teal-500/30 text-xs backdrop-blur-md transition"
               title="Inspect MEDIA_ITEM relation"
             >
-              <Database className="w-3.5 h-3.5 text-indigo-400" />
+              <Database className="w-3.5 h-3.5 text-teal-400" />
               <span>Inspect SQL Tuple</span>
             </button>
           )}
         </div>
 
         {/* Right: Sidebar / Comments / Metadata */}
-        <div className="md:w-2/5 flex flex-col justify-between bg-white border-t md:border-t-0 md:border-l border-slate-100 max-h-[50vh] md:max-h-[92vh] overflow-hidden">
+        <div className="md:w-2/5 flex flex-col justify-between bg-white dark:bg-slate-900 border-t md:border-t-0 md:border-l border-slate-100 dark:border-slate-800 max-h-[50vh] md:max-h-[92vh] overflow-hidden">
           {/* Header */}
-          <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between">
+          <div className="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <ImageWithFallback
                 src={uploader?.avatar_url}
                 alt={uploader?.full_name || 'Uploader'}
-                className="w-10 h-10 rounded-full ring-1 ring-slate-200"
+                className="w-10 h-10 rounded-full ring-1 ring-slate-200 dark:ring-slate-800"
               />
               <div>
-                <h4 className="text-sm font-bold text-slate-900 leading-tight">
+                <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100 leading-tight">
                   {uploader?.full_name || 'Campus Student'}
                 </h4>
                 <div className="flex items-center gap-2 text-xs text-slate-400 mt-0.5">
-                  <span className="font-semibold text-indigo-600 text-[10px] uppercase">
+                  <span className="font-semibold text-teal-600 dark:text-teal-300 text-[10px] uppercase">
                     {uploader?.user_type}
                   </span>
                   <span>•</span>
@@ -206,7 +206,7 @@ export const MediaLightboxModal: React.FC<MediaLightboxModalProps> = ({
                     catch (error) { showToast(error instanceof Error ? error.message : 'Delete failed','error'); }
                     finally { setDeleting(false); }
                   }}
-                  className="p-1.5 text-slate-400 hover:text-rose-600 rounded-lg transition"
+                  className="p-1.5 text-slate-400 hover:text-rose-600 dark:hover:text-rose-300 rounded-lg transition"
                   title="Delete media item"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -214,7 +214,7 @@ export const MediaLightboxModal: React.FC<MediaLightboxModalProps> = ({
               )}
               <button
                 onClick={onClose}
-                className="p-1.5 text-slate-400 hover:text-slate-700 rounded-lg transition"
+                className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 rounded-lg transition"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -225,7 +225,7 @@ export const MediaLightboxModal: React.FC<MediaLightboxModalProps> = ({
           <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-4">
             {/* Caption */}
             {media.caption && (
-              <div className="text-sm text-slate-800 leading-relaxed font-normal bg-slate-50 p-3 rounded-2xl border border-slate-100">
+              <div className="text-sm text-slate-800 dark:text-slate-100 leading-relaxed font-normal bg-slate-50 dark:bg-slate-950 p-3 rounded-2xl border border-slate-100 dark:border-slate-800">
                 {media.caption}
               </div>
             )}
@@ -234,14 +234,14 @@ export const MediaLightboxModal: React.FC<MediaLightboxModalProps> = ({
             {taggedUsers.length > 0 && (
               <div>
                 <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1.5 flex items-center gap-1.5">
-                  <Tag className="w-3 h-3 text-indigo-600" />
+                  <Tag className="w-3 h-3 text-teal-600 dark:text-teal-300" />
                   <span>Tagged In Memory</span>
                 </span>
                 <div className="flex flex-wrap gap-1.5">
                   {taggedUsers.map((tu) => (
                     <span
                       key={tu.user_id}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100"
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-teal-50 dark:bg-teal-950 text-teal-700 dark:text-teal-300 border border-teal-100 dark:border-teal-800"
                     >
                       @{tu.full_name.split(' ')[0]}
                     </span>
@@ -253,8 +253,8 @@ export const MediaLightboxModal: React.FC<MediaLightboxModalProps> = ({
             {/* Comments Thread (Weak Entity Section) */}
             <div className="pt-2">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
-                  <MessageCircle className="w-3.5 h-3.5 text-indigo-600" />
+                <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <MessageCircle className="w-3.5 h-3.5 text-teal-600 dark:text-teal-300" />
                   <span>Comments ({comments.length})</span>
                 </span>
                 <span className="text-[10px] text-slate-400 font-mono">
@@ -271,7 +271,7 @@ export const MediaLightboxModal: React.FC<MediaLightboxModalProps> = ({
                   {comments.map((c) => (
                     <div
                       key={c.comment_no}
-                      className="group flex items-start gap-2.5 text-xs bg-slate-50/70 p-2.5 rounded-xl border border-slate-100/80"
+                      className="group flex items-start gap-2.5 text-xs bg-slate-50/70 dark:bg-slate-950/70 p-2.5 rounded-xl border border-slate-100/80 dark:border-slate-800/80"
                     >
                       <ImageWithFallback
                         src={c.user?.avatar_url}
@@ -280,16 +280,16 @@ export const MediaLightboxModal: React.FC<MediaLightboxModalProps> = ({
                       />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between">
-                          <span className="font-bold text-slate-900">{c.user?.full_name}</span>
+                          <span className="font-bold text-slate-900 dark:text-slate-100">{c.user?.full_name}</span>
                           <span className="text-[10px] text-slate-400 font-mono">#{c.comment_no}</span>
                         </div>
-                        <p className="text-slate-700 mt-0.5 leading-snug break-words">{c.comment_text}</p>
+                        <p className="text-slate-700 dark:text-slate-200 mt-0.5 leading-snug break-words">{c.comment_text}</p>
                       </div>
 
                       {(canAdmin || currentUser?.user_id === c.user_id) && (
                         <button
                           onClick={() => handleDeleteComment(c.comment_no)}
-                          className="opacity-0 group-hover:opacity-100 p-1 text-slate-400 hover:text-rose-600 transition"
+                          className="opacity-0 group-hover:opacity-100 p-1 text-slate-400 hover:text-rose-600 dark:hover:text-rose-300 transition"
                           title="Delete comment"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -303,7 +303,7 @@ export const MediaLightboxModal: React.FC<MediaLightboxModalProps> = ({
           </div>
 
           {/* Footer: Reactions Bar & Comment Input */}
-          <div className="p-4 border-t border-slate-100 bg-slate-50/50 space-y-3">
+          <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50 space-y-3">
             {/* Reaction Pills */}
             <div className="flex items-center justify-between gap-1">
               {reactionTypes.map((rt) => {
@@ -318,8 +318,8 @@ export const MediaLightboxModal: React.FC<MediaLightboxModalProps> = ({
                     onClick={() => handleToggleReaction(rt.type)}
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition border ${
                       hasReacted
-                        ? 'bg-indigo-100/70 border-indigo-300 text-indigo-900 scale-105'
-                        : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-100'
+                        ? 'bg-teal-100/70 dark:bg-teal-900/70 border-teal-300 dark:border-teal-700 text-teal-900 dark:text-teal-200 scale-105'
+                        : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900'
                     }`}
                   >
                     <span>{rt.icon}</span>
@@ -336,12 +336,12 @@ export const MediaLightboxModal: React.FC<MediaLightboxModalProps> = ({
                 placeholder="Write a comment..."
                 value={newCommentText}
                 onChange={(e) => setNewCommentText(e.target.value)}
-                className="flex-1 px-3.5 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-hidden focus:border-indigo-500 transition"
+                className="flex-1 px-3.5 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-slate-100 focus:outline-hidden focus:border-teal-500 transition"
               />
               <button
                 type="submit"
                 disabled={!newCommentText.trim() || submittingComment}
-                className="p-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl transition disabled:opacity-40"
+                className="p-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl transition disabled:opacity-40"
               >
                 <Send className="w-4 h-4" />
               </button>

@@ -34,37 +34,37 @@ export function DatabaseLabPage() {
     <div className="space-y-6 pb-12 min-w-0">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-indigo-600 font-semibold text-xs uppercase">
+          <p className="text-teal-600 dark:text-teal-300 font-semibold text-xs uppercase">
             Live MySQL reports
           </p>
           <h1 className="text-3xl font-extrabold">Database Lab</h1>
         </div>
         <button
           onClick={() => setRevision((v) => v + 1)}
-          className="bg-indigo-600 text-white rounded-xl px-4 py-2 text-sm"
+          className="bg-teal-600 text-white rounded-xl px-4 py-2 text-sm"
         >
           Refresh reports
         </button>
       </div>
-      <p className="text-sm text-slate-600">
+      <p className="text-sm text-slate-600 dark:text-slate-300">
         These results come from SQL executed by the backend. Expand a query to
         explain its joins, aggregates, views and subqueries during your
         presentation.
       </p>
       {loading && <p role="status">Running SQL queries…</p>}
       {error && (
-        <p role="alert" className="text-rose-700">
+        <p role="alert" className="text-rose-700 dark:text-rose-300">
           {error}
         </p>
       )}
       {reports.map((r) => (
         <section
           key={r.title}
-          className="bg-white border border-slate-200 rounded-2xl p-4 sm:p-6 min-w-0 space-y-4"
+          className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-6 min-w-0 space-y-4"
         >
           <h2 className="font-bold">{r.title}</h2>
           <details>
-            <summary className="text-sm text-indigo-700 cursor-pointer">
+            <summary className="text-sm text-teal-700 dark:text-teal-300 cursor-pointer">
               Show executed SQL
             </summary>
             <pre className="mt-3 p-4 bg-slate-950 text-slate-100 rounded-xl text-xs overflow-x-auto">
@@ -79,7 +79,7 @@ export function DatabaseLabPage() {
                     {Object.keys(r.rows[0]).map((k) => (
                       <th
                         key={k}
-                        className="p-2 bg-slate-50 border-b border-slate-200 whitespace-nowrap"
+                        className="p-2 bg-slate-50 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 whitespace-nowrap"
                       >
                         {k}
                       </th>
@@ -92,7 +92,7 @@ export function DatabaseLabPage() {
                       {Object.entries(row).map(([k, value]) => (
                         <td
                           key={k}
-                          className="p-2 border-b border-slate-100 max-w-64 break-words"
+                          className="p-2 border-b border-slate-100 dark:border-slate-800 max-w-64 break-words"
                         >
                           {value === null ? "NULL" : String(value)}
                         </td>
@@ -103,7 +103,7 @@ export function DatabaseLabPage() {
               </table>
             </div>
           ) : (
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-slate-500 dark:text-slate-400">
               No rows match this query yet.
             </p>
           )}

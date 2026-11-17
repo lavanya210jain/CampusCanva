@@ -265,3 +265,88 @@ test("welcome and sign-in pages offer no passwordless evaluator access", async (
   ).toBe(404);
   expect((await page.request.get("/api/auth/me")).status()).toBe(401);
 });
+
+test("feature previews respond to selection and theme persists across public and signed-in pages", async ({
+  page,
+}) => {
+  await page.emulateMedia({ colorScheme: "dark", reducedMotion: "reduce" });
+  await page.goto("/");
+  await expect(page.locator("html")).toHaveClass(/dark/);
+  await expect(
+    page.getByRole("heading", {
+      name: "College happens once. Keep the good parts.",
+    }),
+  ).toBeVisible();
+  const capsules = page.getByRole("button", {
+    name: /A gift to your future self/,
+  });
+  await capsules.click();
+  await expect(capsules).toHaveAttribute("aria-pressed", "true");
+  await expect(
+    page.getByRole("heading", { name: "Send a memory to your future self." }),
+  ).toBeVisible();
+  const sharing = page.getByRole("button", {
+    name: /Shared with the right people/,
+  });
+  await sharing.click();
+  await expect(sharing).toHaveAttribute("aria-pressed", "true");
+  await expect(
+    page.getByRole("heading", {
+      name: "Some stories are just for your circle.",
+    }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Switch to light mode", exact: true })
+    .click();
+  await expect(page.locator("html")).not.toHaveClass(/dark/);
+  await page.reload();
+  await expect(page.locator("html")).not.toHaveClass(/dark/);
+  expect(
+    await page.evaluate(() => localStorage.getItem("campuscanva_theme")),
+  ).toBe("light");
+  await page.goto("/login");
+  await page
+    .getByRole("button", { name: "Switch to dark mode", exact: true })
+    .click();
+  await page.goto("/register");
+  await expect(page.locator("html")).toHaveClass(/dark/);
+  await page.goto("/login");
+  await page
+    .locator('input[type="email"]')
+    .fill("student.demo@campuscanva.local");
+  await page.locator('input[type="password"]').fill("CampusCanva123!");
+  await page.getByRole("button", { name: "Sign In", exact: true }).click();
+  await expect(page).toHaveURL(/\/dashboard$/);
+  await expect(
+    page.getByRole("button", { name: "Switch to light mode", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "New Space", exact: true }).click();
+  const dialog = page.getByRole("dialog", { name: "Create memory space" });
+  await expect(dialog).toBeVisible();
+  expect(
+    await dialog
+      .locator("form")
+      .evaluate((form) => getComputedStyle(form.parentElement).backgroundColor),
+  ).not.toBe("rgb(255, 255, 255)");
+  await page.keyboard.press("Escape");
+  await expect(dialog).not.toBeVisible();
+  await page.setViewportSize({ width: 390, height: 844 });
+  for (const path of [
+    "/",
+    "/dashboard",
+    "/explore",
+    "/profile",
+    "/database-lab",
+  ]) {
+    await page.goto(path);
+    await expect(page.locator("h1")).toBeVisible();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    await expect(
+      page.getByRole("button", { name: "Switch to light mode", exact: true }),
+    ).toBeVisible();
+  }
+});

@@ -201,24 +201,24 @@ export const AddMemoryModal: React.FC<AddMemoryModalProps> = ({
       aria-label="Add campus memory"
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-fade-in overflow-y-auto"
     >
-      <div className="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl border border-slate-100 my-8">
-        <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+      <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl border border-slate-100 dark:border-slate-800 my-8">
+        <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-2xl bg-teal-50 dark:bg-teal-950 text-teal-600 dark:text-teal-300 flex items-center justify-center">
               <UploadCloud className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-slate-900">
+              <h2 className="text-lg font-bold text-slate-900 dark:text-slate-100">
                 Add Campus Memory
               </h2>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Upload photos or video clips into a Memory Space
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-slate-600 rounded-xl transition"
+            className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 rounded-xl transition"
           >
             <X className="w-5 h-5" />
           </button>
@@ -227,13 +227,13 @@ export const AddMemoryModal: React.FC<AddMemoryModalProps> = ({
         <form onSubmit={handleSubmit} className="mt-5 space-y-4">
           {/* Target Space */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
               Select Memory Space *
             </label>
             <select
               value={selectedSpaceId}
               onChange={(e) => setSelectedSpaceId(parseInt(e.target.value, 10))}
-              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:outline-hidden focus:bg-white focus:border-indigo-500 transition"
+              className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm text-slate-900 dark:text-slate-100 focus:outline-hidden focus:bg-white dark:focus:bg-slate-900 focus:border-teal-500 transition"
               required
             >
               {!allowedSpaces.length && (
@@ -297,7 +297,7 @@ export const AddMemoryModal: React.FC<AddMemoryModalProps> = ({
                 className="block w-full text-sm"
               />
               {file && (
-                <p className="text-xs text-indigo-700">
+                <p className="text-xs text-teal-700 dark:text-teal-300">
                   {file.name} · {(file.size / 1024 / 1024).toFixed(2)} MB · will
                   be saved on this laptop
                 </p>
@@ -310,7 +310,7 @@ export const AddMemoryModal: React.FC<AddMemoryModalProps> = ({
                   className="w-full"
                 />
               )}
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Or import a public media URL below. File selection takes
                 priority.
               </p>
@@ -318,7 +318,7 @@ export const AddMemoryModal: React.FC<AddMemoryModalProps> = ({
           )}
           {/* Media Type Switcher */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
               Media type
             </label>
             <div className="grid grid-cols-2 gap-3">
@@ -327,8 +327,8 @@ export const AddMemoryModal: React.FC<AddMemoryModalProps> = ({
                 onClick={() => setMediaType("PHOTO")}
                 className={`flex items-center justify-center gap-2 py-2.5 rounded-xl border text-xs font-bold transition ${
                   mediaType === "PHOTO"
-                    ? "bg-indigo-50 border-indigo-500 text-indigo-700"
-                    : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                    ? "bg-teal-50 dark:bg-teal-950 border-teal-500 text-teal-700 dark:text-teal-300"
+                    : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-950"
                 }`}
               >
                 <ImageIcon className="w-4 h-4" />
@@ -339,8 +339,8 @@ export const AddMemoryModal: React.FC<AddMemoryModalProps> = ({
                 onClick={() => setMediaType("VIDEO")}
                 className={`flex items-center justify-center gap-2 py-2.5 rounded-xl border text-xs font-bold transition ${
                   mediaType === "VIDEO"
-                    ? "bg-indigo-50 border-indigo-500 text-indigo-700"
-                    : "bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
+                    ? "bg-teal-50 dark:bg-teal-950 border-teal-500 text-teal-700 dark:text-teal-300"
+                    : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-950"
                 }`}
               >
                 <Film className="w-4 h-4" />
@@ -351,7 +351,7 @@ export const AddMemoryModal: React.FC<AddMemoryModalProps> = ({
 
           {/* Media URL with Preview */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
               {file && !isMockMode
                 ? "Media URL (not needed for a selected file)"
                 : "Media File URL *"}
@@ -361,7 +361,7 @@ export const AddMemoryModal: React.FC<AddMemoryModalProps> = ({
               placeholder="https://images.unsplash.com/..."
               value={mediaUrl}
               onChange={(e) => setMediaUrl(e.target.value)}
-              className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:outline-hidden focus:bg-white focus:border-indigo-500 transition mb-2"
+              className="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-slate-100 focus:outline-hidden focus:bg-white dark:focus:bg-slate-900 focus:border-teal-500 transition mb-2"
               required={!file || isMockMode}
               disabled={!!file && !isMockMode}
             />
@@ -378,7 +378,7 @@ export const AddMemoryModal: React.FC<AddMemoryModalProps> = ({
                     setMediaUrl(preset.url);
                     setMediaType(preset.type as "PHOTO" | "VIDEO");
                   }}
-                  className="text-[11px] px-2.5 py-1 bg-white border border-slate-200 hover:bg-slate-50 rounded-lg text-slate-600 transition"
+                  className="text-[11px] px-2.5 py-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-950 rounded-lg text-slate-600 dark:text-slate-300 transition"
                 >
                   {preset.label}
                 </button>
@@ -386,7 +386,7 @@ export const AddMemoryModal: React.FC<AddMemoryModalProps> = ({
             </div>
 
             {/* Instant Preview Box */}
-            <div className="w-full h-36 rounded-xl overflow-hidden border border-slate-200 bg-slate-100 flex items-center justify-center">
+            <div className="w-full h-36 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 flex items-center justify-center">
               {mediaType === "PHOTO" ? (
                 <ImageWithFallback
                   src={mediaUrl}
@@ -405,7 +405,7 @@ export const AddMemoryModal: React.FC<AddMemoryModalProps> = ({
 
           {/* Caption */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1.5">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-1.5">
               Memory Caption & Context
             </label>
             <textarea
@@ -413,22 +413,22 @@ export const AddMemoryModal: React.FC<AddMemoryModalProps> = ({
               placeholder="Who was there? What was the moment about?"
               value={caption}
               onChange={(e) => setCaption(e.target.value)}
-              className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:outline-hidden focus:bg-white focus:border-indigo-500 transition resize-none"
+              className="w-full px-3.5 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm text-slate-900 dark:text-slate-100 focus:outline-hidden focus:bg-white dark:focus:bg-slate-900 focus:border-teal-500 transition resize-none"
             />
           </div>
 
           {/* Tag Users (M:N Table media_tag) */}
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label className="text-xs font-semibold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
-                <Users className="w-3.5 h-3.5 text-indigo-600" />
+              <label className="text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                <Users className="w-3.5 h-3.5 text-teal-600 dark:text-teal-300" />
                 <span>Tag people</span>
               </label>
               <span className="text-[11px] text-slate-400">
                 {taggedUserIds.length} selected
               </span>
             </div>
-            <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-1.5 border border-slate-200 rounded-xl bg-slate-50">
+            <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto p-1.5 border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50 dark:bg-slate-950">
               {taggableUsers.map((u) => {
                 const isSelected = taggedUserIds.includes(u.user_id);
                 return (
@@ -438,8 +438,8 @@ export const AddMemoryModal: React.FC<AddMemoryModalProps> = ({
                     onClick={() => toggleTagUser(u.user_id)}
                     className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition ${
                       isSelected
-                        ? "bg-indigo-600 text-white shadow-xs"
-                        : "bg-white text-slate-700 border border-slate-200 hover:bg-slate-100"
+                        ? "bg-teal-600 text-white shadow-xs"
+                        : "bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-900"
                     }`}
                   >
                     <span>{u.full_name}</span>
@@ -455,14 +455,14 @@ export const AddMemoryModal: React.FC<AddMemoryModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2.5 text-sm font-semibold text-slate-600 hover:text-slate-900 rounded-xl transition"
+              className="px-5 py-2.5 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 rounded-xl transition"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={submitting || !allowedSpaces.length}
-              className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl shadow-md shadow-indigo-100 transition disabled:opacity-50"
+              className="px-6 py-2.5 bg-teal-600 hover:bg-teal-700 text-white text-sm font-semibold rounded-xl shadow-md shadow-teal-100 dark:shadow-black/10 transition disabled:opacity-50"
             >
               {submitting ? "Uploading..." : "Add Memory"}
             </button>

@@ -72,3 +72,11 @@ The rule applies in registration and profile editing, is checked again on the AP
 - Capsule notification inserts and the checkpoint update commit together under a row lock.
 
 The MySQL mode provides these features. The optional browser-storage practice mode is for UI rehearsal; private-space creation and local avatar uploads require MySQL.
+
+## Forest / cream visual update and dark mode
+
+The landing page now has illustrated, clickable previews for spaces, capsules and sharing controls. These are labeled examples; their buttons lead to the real application or registration. The UI uses forest green, warm cream and terracotta throughout.
+
+Use the moon/sun button in the welcome header, authentication pages or app navbar to switch themes. The initial theme follows the device's colour preference until you choose one. A choice is saved in the browser and survives navigation and reloads. This changes appearance only; it does not change data mode, permissions or database content. Reduced-motion preferences disable decorative motion.
+
+Apply this update using the ZIP/copy steps above, preserving `.env` and `server/uploads`. If the earlier database update is already installed, this visual update needs no additional database migration.

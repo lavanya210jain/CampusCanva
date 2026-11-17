@@ -1,145 +1,353 @@
-import { DatabaseStatus } from '../components/common/DatabaseStatus';
-import React from 'react';
-import { Link } from 'react-router-dom';
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import {
-  Layers,
-  Sparkles,
   ArrowRight,
-  Clock,
+  ArrowUpRight,
+  Layers,
+  Leaf,
   MapPin,
-  Image as ImageIcon,
+  Clock,
+  LockKeyhole,
   Users,
-  ShieldCheck,
-  CheckCircle2,
-} from 'lucide-react';
-
-export const WelcomeLanding: React.FC = () => {
-
+  Image as ImageIcon,
+  Check,
+  Heart,
+  Sparkles,
+} from "lucide-react";
+import { ThemeToggle } from "../components/common/ThemeToggle";
+import { CampusIllustration } from "../components/common/CampusIllustration";
+import { DatabaseStatus } from "../components/common/DatabaseStatus";
+import { useAuth } from "../context/AuthContext";
+const features = [
+  {
+    id: "spaces",
+    icon: MapPin,
+    eyebrow: "MAKE ROOM FOR YOUR MEMORIES",
+    title: "One space. A hundred stories.",
+    description:
+      "The fest, the society trip, the everyday chai break. Keep the photos, people and little details together.",
+    action: "Explore memory spaces",
+    path: "/explore",
+  },
+  {
+    id: "capsules",
+    icon: Clock,
+    eyebrow: "A LITTLE SOMETHING FOR LATER",
+    title: "Send a memory to your future self.",
+    description:
+      "Save the moments you aren’t ready to say goodbye to. Pick an opening date and let the reunion come to you.",
+    action: "Discover time capsules",
+    path: "/time-capsules",
+  },
+  {
+    id: "sharing",
+    icon: LockKeyhole,
+    eyebrow: "YOUR PEOPLE. YOUR CHOICE.",
+    title: "Some stories are just for your circle.",
+    description:
+      "Keep a space private for your collaborators, or make it public for the campus. You choose who gets to contribute.",
+    action: "Create your own space",
+    path: "/my-spaces",
+  },
+] as const;
+export const WelcomeLanding = () => {
+  const [active, setActive] = useState(0);
+  const { isAuthenticated } = useAuth();
+  const feature = features[active];
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col justify-between">
-      {/* Top Banner Navigation */}
-      <header className="border-b border-slate-200/80 bg-white/80 backdrop-blur-md sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-md">
-              <Layers className="w-5 h-5" />
-            </div>
-            <div>
-              <span className="font-extrabold text-lg tracking-tight text-slate-900">CampusCanva</span>
-              <span className="ml-2 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100">
-                NSUT Delhi
+    <div className="welcome-page">
+      <header className="welcome-header">
+        <div className="welcome-nav">
+          <Link to="/" className="welcome-brand">
+            <span className="brand-mark">
+              <Layers size={21} />
+            </span>
+            <span>
+              CampusCanva
+              <span className="brand-subtitle">
+                A place for your college days
               </span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Link
-              to="/login"
-              className="px-4 py-2 text-sm font-semibold text-slate-700 hover:text-slate-900 rounded-xl transition"
-            >
-              Sign In
+            </span>
+          </Link>
+          <div className="welcome-nav-actions">
+            <ThemeToggle />
+            <Link to="/login" className="welcome-signin">
+              Sign in
             </Link>
             <Link
-              to="/register"
-              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl shadow-xs transition"
+              to={isAuthenticated ? "/dashboard" : "/register"}
+              className="welcome-button welcome-header-cta"
             >
-              Get Started
+              {isAuthenticated ? "My campus" : "Join the story"}
+              <ArrowUpRight size={15} />
             </Link>
           </div>
         </div>
       </header>
-
-      <div className="max-w-7xl w-full mx-auto px-4"><DatabaseStatus /></div>
-      {/* Main Hero Section */}
-      <main className="flex-1">
-        <section className="relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-28">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center max-w-3xl mx-auto">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-bold mb-6 animate-fade-in">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>DBMS Lab Project • Netaji Subhas University of Technology</span>
-              </div>
-
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 tracking-tight leading-tight">
-                Every moment has a place.
-                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-800">
-                  A Living Digital Archive.
-                </span>
-              </h1>
-
-              <p className="mt-6 text-base sm:text-lg text-slate-600 leading-relaxed font-normal">
-                Instead of scattered photos across chat groups and personal drives, CampusCanva unites
-                college memories into structured, context-rich <strong>Memory Spaces</strong> connected
-                to campus spots, people, and time capsules.
-              </p>
-
-              {/* Action Buttons */}
-              <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
-                <Link
-                  to="/dashboard"
-                  className="w-full sm:w-auto px-8 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-sm rounded-2xl shadow-lg shadow-indigo-100 flex items-center justify-center gap-2 transition"
-                >
-                  <span>Enter Application</span>
-                  <ArrowRight className="w-4 h-4" />
-                </Link>
-
-                <Link
-                  to="/login"
-                  className="w-full sm:w-auto px-7 py-3.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 font-bold text-sm rounded-2xl shadow-xs transition"
-                >
-                  Sign In with Credentials
-                </Link>
-              </div>
-
-
+      <main>
+        <section className="welcome-hero">
+          <div className="hero-copy">
+            <p className="welcome-eyebrow">
+              <Leaf size={15} /> MADE FOR THE DAYS THAT MATTER
+            </p>
+            <h1>
+              College happens once.
+              <br />
+              <em>Keep the good parts.</em>
+            </h1>
+            <p className="hero-description">
+              Big celebrations. Familiar corners. Your favourite people. Give
+              your campus memories a home you can always come back to.
+            </p>
+            <div className="hero-actions">
+              <Link
+                to={isAuthenticated ? "/dashboard" : "/register"}
+                className="welcome-button"
+              >
+                {isAuthenticated
+                  ? "Open my campus"
+                  : "Start your memory collection"}
+                <ArrowRight size={17} />
+              </Link>
+              <a href="#features" className="welcome-text-link">
+                Take a little look <ArrowUpRight size={16} />
+              </a>
             </div>
-
-            {/* Feature Cards Grid */}
-            <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs hover:shadow-lg transition">
-                <div className="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mb-4">
-                  <MapPin className="w-6 h-6" />
-                </div>
-                <h3 className="text-lg font-bold text-slate-900 mb-2">Campus-First Spaces</h3>
-                <p className="text-xs text-slate-500 leading-relaxed">
-                  Every memory belongs to an event, batch, club, or landmark campus spot like Central
-                  Lawn, Nescafe, or Admin Block.
-                </p>
+            <div className="hero-reassurance">
+              <span>
+                <Check size={14} /> Photos & stories
+              </span>
+              <span>
+                <Check size={14} /> Your circle
+              </span>
+              <span>
+                <Check size={14} /> Memories for later
+              </span>
+            </div>
+          </div>
+          <div
+            className="hero-board"
+            aria-label="Illustrated campus memory board"
+          >
+            <div className="board-orbit orbit-one" />
+            <div className="board-orbit orbit-two" />
+            <div className="board-note note-top">
+              <span className="note-dot" /> a little nostalgia, saved.
+            </div>
+            <div className="memory-polaroid">
+              <div className="polaroid-tape" />
+              <CampusIllustration />
+              <div className="polaroid-caption">
+                <span>Our kind of place.</span>
+                <Heart size={19} />
               </div>
-
-              <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs hover:shadow-lg transition">
-                <div className="w-12 h-12 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center mb-4">
-                  <Clock className="w-6 h-6" />
-                </div>
-                <h3 className="text-lg font-bold text-slate-900 mb-2">Time-Locked Capsules</h3>
-                <p className="text-xs text-slate-500 leading-relaxed">
-                  Lock special batch memories and farewell messages with automated countdown timers that
-                  reveal content strictly on your target graduation date.
-                </p>
+            </div>
+            <div className="board-note note-bottom">
+              <span className="note-icon">
+                <MapPin size={18} />
+              </span>
+              <div>
+                <strong>Same campus. So many stories.</strong>
+                <span>Make a little room for yours.</span>
               </div>
-
-              <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs hover:shadow-lg transition">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4">
-                  <ShieldCheck className="w-6 h-6" />
-                </div>
-                <h3 className="text-lg font-bold text-slate-900 mb-2">Strong DBMS Modeling</h3>
-                <p className="text-xs text-slate-500 leading-relaxed">
-                  Built on strict RDBMS principles: ISA specialization, weak entity comments, composite
-                  membership roles, and atomic transaction integrity.
-                </p>
+            </div>
+            <span className="board-spark">
+              <Sparkles size={25} />
+            </span>
+          </div>
+        </section>
+        <section id="features" className="welcome-features">
+          <div className="features-heading">
+            <div>
+              <p className="welcome-eyebrow">MORE THAN A CAMERA ROLL</p>
+              <h2>
+                Good memories deserve
+                <br />
+                <em>a place to belong.</em>
+              </h2>
+            </div>
+            <p>
+              A space for now. A surprise for later.
+              <br />
+              And the people who make it all worth saving.
+            </p>
+          </div>
+          <div className="feature-showcase">
+            <div
+              className="feature-options"
+              aria-label="Explore CampusCanva features"
+            >
+              {features.map((item, index) => {
+                const Icon = item.icon;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    aria-pressed={active === index}
+                    aria-controls="feature-preview"
+                    onClick={() => setActive(index)}
+                    className={`feature-option ${active === index ? "is-active" : ""}`}
+                  >
+                    <span className="feature-icon">
+                      <Icon size={20} />
+                    </span>
+                    <span>
+                      <strong>
+                        {index === 0
+                          ? "Spaces that tell your story"
+                          : index === 1
+                            ? "A gift to your future self"
+                            : "Shared with the right people"}
+                      </strong>
+                      <small>
+                        {index === 0
+                          ? "Keep every chapter together"
+                          : index === 1
+                            ? "Seal it now. Relive it later."
+                            : "Public for campus. Private for your circle."}
+                      </small>
+                    </span>
+                    <ArrowUpRight size={18} />
+                  </button>
+                );
+              })}
+            </div>
+            <div
+              id="feature-preview" role="region" aria-label="Feature preview" aria-live="polite"
+              className={`feature-preview preview-${feature.id}`}
+            >
+              <div
+                className="preview-illustration"
+                aria-label={`${feature.id} feature illustration`}
+              >
+                {active === 0 ? (
+                  <div className="space-preview">
+                    <div className="mini-memory">
+                      <CampusIllustration />
+                      <span>
+                        <MapPin size={12} /> Around campus
+                      </span>
+                    </div>
+                    <div className="mini-memory mini-story">
+                      <ImageIcon size={25} />
+                      <strong>
+                        The days
+                        <br />
+                        in between.
+                      </strong>
+                      <span>A space for your everyday favourites</span>
+                      <div className="mini-avatars">
+                        <span>A</span>
+                        <span>M</span>
+                        <span>R</span>
+                        <small>Your people, together</small>
+                      </div>
+                    </div>
+                    <span className="preview-caption">
+                      An example of your next memory space
+                    </span>
+                  </div>
+                ) : active === 1 ? (
+                  <div className="capsule-preview">
+                    <div className="capsule-seal">
+                      <LockKeyhole size={31} />
+                    </div>
+                    <span className="capsule-label">TO OUR FUTURE SELVES</span>
+                    <strong>
+                      Open when
+                      <br />
+                      the time is right.
+                    </strong>
+                    <span className="capsule-date">
+                      <Clock size={14} /> Your date. Your little reunion.
+                    </span>
+                    <span className="preview-caption">
+                      Choose an unlock date when you create a capsule
+                    </span>
+                  </div>
+                ) : (
+                  <div className="sharing-preview">
+                    <div className="sharing-head">
+                      <span className="feature-icon">
+                        <Users size={22} />
+                      </span>
+                      <div>
+                        <strong>Your inner circle</strong>
+                        <small>You set the boundaries.</small>
+                      </div>
+                      <span className="private-pill">
+                        <LockKeyhole size={11} /> Private
+                      </span>
+                    </div>
+                    {[
+                      ["You", "Admin"],
+                      ["Your friend", "Contributor"],
+                      ["Your classmate", "Viewer"],
+                    ].map(([name, role], i) => (
+                      <div className="sharing-person" key={role}>
+                        <span className={`person-avatar person-${i}`}>
+                          {i === 0 ? "Y" : i === 1 ? "F" : "C"}
+                        </span>
+                        <strong>{name}</strong>
+                        <span>{role}</span>
+                      </div>
+                    ))}
+                    <p>
+                      <Check size={13} /> Only members can see a private space.
+                    </p>
+                    <span className="preview-caption">
+                      An example of the roles you can assign
+                    </span>
+                  </div>
+                )}
+              </div>
+              <div className="preview-copy">
+                <p className="welcome-eyebrow">{feature.eyebrow}</p>
+                <h3>{feature.title}</h3>
+                <p>{feature.description}</p>
+                <Link
+                  to={isAuthenticated ? feature.path : "/register"}
+                  className="welcome-text-link"
+                >
+                  {feature.action}
+                  <ArrowRight size={16} />
+                </Link>
               </div>
             </div>
           </div>
         </section>
+        <section className="welcome-closing">
+          <Leaf size={26} />
+          <h2>
+            Someday, these will be
+            <br />
+            <em>the good old days.</em>
+          </h2>
+          <p>Start saving a little of today.</p>
+          <Link
+            to={isAuthenticated ? "/dashboard" : "/register"}
+            className="welcome-button"
+          >
+            {isAuthenticated
+              ? "Back to my memories"
+              : "Make your first memory space"}
+            <ArrowRight size={16} />
+          </Link>
+        </section>
       </main>
-
-      {/* Footer */}
-      <footer className="border-t border-slate-200 bg-white py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-3">
-          <div>CampusCanva • DBMS Lab Project 2026 • NSUT Delhi</div>
-          <div className="font-medium text-slate-700">
-            Team: Kavya Gupta • Rohan Kumar • Ansh Dhillon • Lavanya Jain
-          </div>
+      <footer className="welcome-footer">
+        <Link to="/" className="welcome-brand">
+          <span className="brand-mark">
+            <Layers size={18} />
+          </span>
+          CampusCanva
+        </Link>
+        <span>Made for campus life · NSUT Delhi</span>
+        <Link to="/login">
+          Your memories are waiting <ArrowUpRight size={13} />
+        </Link>
+        <div className="welcome-connection">
+          <DatabaseStatus />
         </div>
       </footer>
     </div>

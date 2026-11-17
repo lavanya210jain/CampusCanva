@@ -50,14 +50,14 @@ export const TimeCapsulesPage: React.FC<TimeCapsulesPageProps> = ({ onOpenCreate
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold mb-2">
-            <Clock className="w-3.5 h-3.5 text-amber-600" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-950 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-200 text-xs font-bold mb-2">
+            <Clock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-300" />
             <span>Time-Locked Relational Vaults</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
             Campus Time Capsules
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1 max-w-xl">
+          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-xl">
             Vault college moments, farewell predictions, and batch letters to be revealed automatically
             on future milestone dates.
           </p>
@@ -65,7 +65,7 @@ export const TimeCapsulesPage: React.FC<TimeCapsulesPageProps> = ({ onOpenCreate
 
         <button
           onClick={onOpenCreateModal}
-          className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition shadow-xs self-start sm:self-auto"
+          className="flex items-center gap-2 px-4 py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-xs font-bold transition shadow-xs self-start sm:self-auto"
         >
           <PlusCircle className="w-4 h-4" />
           <span>Create New Capsule</span>
@@ -73,13 +73,13 @@ export const TimeCapsulesPage: React.FC<TimeCapsulesPageProps> = ({ onOpenCreate
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex items-center gap-2 border-b border-slate-200 pb-3 text-xs font-bold">
+      <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-800 pb-3 text-xs font-bold">
         <button
           onClick={() => setFilter('all')}
           className={`px-4 py-2 rounded-xl transition ${
             filter === 'all'
               ? 'bg-slate-900 text-white'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-900'
           }`}
         >
           All Capsules ({spaces.length})
@@ -89,7 +89,7 @@ export const TimeCapsulesPage: React.FC<TimeCapsulesPageProps> = ({ onOpenCreate
           className={`px-4 py-2 rounded-xl transition flex items-center gap-1.5 ${
             filter === 'locked'
               ? 'bg-amber-500 text-white shadow-xs'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-900'
           }`}
         >
           <Lock className="w-3.5 h-3.5" />
@@ -100,7 +100,7 @@ export const TimeCapsulesPage: React.FC<TimeCapsulesPageProps> = ({ onOpenCreate
           className={`px-4 py-2 rounded-xl transition flex items-center gap-1.5 ${
             filter === 'unlocked'
               ? 'bg-emerald-600 text-white shadow-xs'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+              : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-900'
           }`}
         >
           <Unlock className="w-3.5 h-3.5" />
@@ -110,10 +110,10 @@ export const TimeCapsulesPage: React.FC<TimeCapsulesPageProps> = ({ onOpenCreate
 
       {/* Capsules Grid */}
       {displayedCapsules.length === 0 ? (
-        <div className="bg-white rounded-3xl p-12 text-center border border-slate-200">
+        <div className="bg-white dark:bg-slate-900 rounded-3xl p-12 text-center border border-slate-200 dark:border-slate-800">
           <Clock className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-          <h3 className="font-bold text-slate-900 text-base">No capsules found</h3>
-          <p className="text-xs text-slate-500 mt-1">Create a time capsule to preserve memories for the future!</p>
+          <h3 className="font-bold text-slate-900 dark:text-slate-100 text-base">No capsules found</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Create a time capsule to preserve memories for the future!</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -79,7 +79,7 @@ export const AppLayout: React.FC = () => {
   if (!isAuthenticated) return <Navigate to="/login" replace />;
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans">
       {/* Top Navbar */}
       <Navbar
         onOpenCreateModal={() => setIsCreateSpaceOpen(true)}
@@ -88,7 +88,7 @@ export const AppLayout: React.FC = () => {
 
       <nav
         aria-label="Mobile navigation"
-        className="md:hidden flex gap-2 overflow-x-auto bg-white border-b p-3 text-xs whitespace-nowrap"
+        className="md:hidden flex gap-2 overflow-x-auto bg-white dark:bg-slate-900 border-b p-3 text-xs whitespace-nowrap"
       >
         {[
           ["/dashboard", "Dashboard"],
@@ -102,7 +102,7 @@ export const AppLayout: React.FC = () => {
             key={path}
             to={path}
             className={({ isActive }) =>
-              `px-3 py-2 rounded-lg ${isActive ? "bg-indigo-100 text-indigo-800" : "text-slate-600"}`
+              `px-3 py-2 rounded-lg ${isActive ? "bg-teal-100 dark:bg-teal-900 text-teal-800 dark:text-teal-200" : "text-slate-600 dark:text-slate-300"}`
             }
           >
             {label}

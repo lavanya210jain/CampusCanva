@@ -34,7 +34,7 @@ export function DatabaseStatus() {
   return (
     <div
       role="status"
-      className={`text-xs rounded-xl border p-3 my-4 ${ok ? "bg-emerald-50 text-emerald-800 border-emerald-200" : "bg-amber-50 text-amber-900 border-amber-200"}`}
+      className={`text-xs rounded-xl border p-3 my-4 ${ok ? "bg-emerald-50 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-200 border-emerald-200 dark:border-emerald-800" : "bg-amber-50 dark:bg-amber-950 text-amber-900 dark:text-amber-200 border-amber-200 dark:border-amber-800"}`}
     >
       {status}{" "}
       {!ok && !isMockMode && (

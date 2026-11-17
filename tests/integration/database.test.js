@@ -86,7 +86,7 @@ test("password verification, session identity and password redaction", async () 
   assert.ok(users.body.every((u) => !("password_hash" in u)));
   assert.equal(
     (await call(student, "/auth/demo", "POST", { userId: 2 })).status,
-    403,
+    404,
   );
   const logoutClient = {};
   await login(logoutClient, "student.demo@campuscanva.local");
@@ -667,5 +667,15 @@ test("repeated database upgrades preserve existing spaces, memberships and media
     );
   } finally {
     await call(student, `/spaces/${s.space_id}`, "DELETE");
+  }
+});
+
+
+test('legacy quick-login cannot create a session even with an old enabled environment flag',async()=>{
+  process.env.DEMO_LOGIN='true';
+  for(const userId of [1,5,7]) {
+    const client={};
+    assert.equal((await call(client,'/auth/demo','POST',{userId})).status,404);
+    assert.equal((await call(client,'/auth/me')).status,401);
   }
 });

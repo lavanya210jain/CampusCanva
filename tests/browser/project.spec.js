@@ -6,8 +6,13 @@ test("MySQL UI: login, create, upload, refresh, delete, reports and mobile layou
   const errors = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await page.goto("/login");
+  await page
+    .locator('input[type="email"]')
+    .fill("student.demo@campuscanva.local");
+  await page.locator('input[type="password"]').fill("CampusCanva123!");
   await page.getByRole("button", { name: "Sign In", exact: true }).click();
   await expect(page).toHaveURL(/\/dashboard$/);
+  await expect(page.getByRole("button", { name: /Persona:/ })).toHaveCount(0);
   const title = `Browser check ${Date.now()}`;
   let spaceId;
   try {
@@ -100,6 +105,10 @@ test("private visibility and local profile photo controls work in the UI", async
   browser,
 }) => {
   await page.goto("/login");
+  await page
+    .locator('input[type="email"]')
+    .fill("student.demo@campuscanva.local");
+  await page.locator('input[type="password"]').fill("CampusCanva123!");
   await page.getByRole("button", { name: "Sign In", exact: true }).click();
   await expect(page).toHaveURL(/\/dashboard$/);
   await expect(
@@ -126,7 +135,11 @@ test("private visibility and local profile photo controls work in the UI", async
     spaceId = Number(new URL(page.url()).pathname.split("/").at(-1));
     await outsider.goto("/login");
     await outsider
-      .getByRole("button", { name: "Faculty", exact: true })
+      .locator('input[type="email"]')
+      .fill("faculty.demo@campuscanva.local");
+    await outsider.locator('input[type="password"]').fill("CampusCanva123!");
+    await outsider
+      .getByRole("button", { name: "Sign In", exact: true })
       .click();
     await expect(outsider).toHaveURL(/\/dashboard$/);
     await outsider.goto("/explore");
@@ -195,6 +208,10 @@ test("an unlocked capsule appears in notifications without refreshing the browse
   page,
 }) => {
   await page.goto("/login");
+  await page
+    .locator('input[type="email"]')
+    .fill("student.demo@campuscanva.local");
+  await page.locator('input[type="password"]').fill("CampusCanva123!");
   await page.getByRole("button", { name: "Sign In", exact: true }).click();
   await expect(page).toHaveURL(/\/dashboard$/);
   const title = `Live capsule ${Date.now()}`;
@@ -225,4 +242,26 @@ test("an unlocked capsule appears in notifications without refreshing the browse
   } finally {
     await page.request.delete(`/api/spaces/${s.space_id}`);
   }
+});
+
+test("welcome and sign-in pages offer no passwordless evaluator access", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await expect(
+    page.getByText("Evaluator Quick Access", { exact: false }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByRole("button", { name: "Demo Student", exact: false }),
+  ).toHaveCount(0);
+  await page.goto("/login");
+  await expect(page.getByText("Lab Evaluator 1-Click Access")).toHaveCount(0);
+  await expect(page.locator('input[type="email"]')).toHaveValue("");
+  await expect(page.locator('input[type="password"]')).toHaveValue("");
+  expect(
+    (
+      await page.request.post("/api/auth/demo", { data: { userId: 1 } })
+    ).status(),
+  ).toBe(404);
+  expect((await page.request.get("/api/auth/me")).status()).toBe(401);
 });

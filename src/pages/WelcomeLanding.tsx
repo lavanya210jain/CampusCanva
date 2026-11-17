@@ -1,6 +1,6 @@
 import { DatabaseStatus } from '../components/common/DatabaseStatus';
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
   Layers,
   Sparkles,
@@ -12,19 +12,8 @@ import {
   ShieldCheck,
   CheckCircle2,
 } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
-import { useToast } from '../context/ToastContext';
 
 export const WelcomeLanding: React.FC = () => {
-  const { switchUser } = useAuth();
-  const { showToast } = useToast();
-  const navigate = useNavigate();
-
-  const handleQuickDemo = async (userId: number, roleName: string) => {
-    try { await switchUser(userId); } catch { return; }
-    showToast(`Logged in as ${roleName} for live evaluation demo`, 'success');
-    navigate('/dashboard');
-  };
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col justify-between">
@@ -102,53 +91,7 @@ export const WelcomeLanding: React.FC = () => {
                 </Link>
               </div>
 
-              {/* Lab Evaluator Quick Login Card */}
-              <div className="mt-10 p-5 rounded-3xl bg-white border border-slate-200/90 shadow-xl max-w-xl mx-auto text-left">
-                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                  <div className="flex items-center gap-2">
-                    <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                    <span className="text-xs font-bold uppercase tracking-wider text-slate-700">
-                      Evaluator Quick Access (1-Click Demo)
-                    </span>
-                  </div>
-                  <span className="text-[11px] text-slate-400">No signup needed</span>
-                </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 mt-3">
-                  <button
-                    onClick={() => handleQuickDemo(1, 'Demo Student')}
-                    className="p-3 rounded-2xl bg-indigo-50/70 hover:bg-indigo-100/70 border border-indigo-100 text-left transition group"
-                  >
-                    <div className="text-xs font-bold text-indigo-950 group-hover:text-indigo-600">
-                      Demo Student
-                    </div>
-                    <div className="text-[10px] text-indigo-600 font-semibold mt-0.5 uppercase">Student Role</div>
-                    <div className="text-[10px] text-slate-400 mt-1">Roll: 2025UCS1583</div>
-                  </button>
-
-                  <button
-                    onClick={() => handleQuickDemo(5, 'Demo Faculty')}
-                    className="p-3 rounded-2xl bg-purple-50/70 hover:bg-purple-100/70 border border-purple-100 text-left transition group"
-                  >
-                    <div className="text-xs font-bold text-purple-950 group-hover:text-purple-600">
-                      Demo Faculty
-                    </div>
-                    <div className="text-[10px] text-purple-600 font-semibold mt-0.5 uppercase">Faculty Role</div>
-                    <div className="text-[10px] text-slate-400 mt-1">CSE Dept Head</div>
-                  </button>
-
-                  <button
-                    onClick={() => handleQuickDemo(7, 'Demo Alumni')}
-                    className="p-3 rounded-2xl bg-amber-50/70 hover:bg-amber-100/70 border border-amber-100 text-left transition group"
-                  >
-                    <div className="text-xs font-bold text-amber-950 group-hover:text-amber-600">
-                      Demo Alumni
-                    </div>
-                    <div className="text-[10px] text-amber-600 font-semibold mt-0.5 uppercase">Alumni Role</div>
-                    <div className="text-[10px] text-slate-400 mt-1">Google • 2023 Batch</div>
-                  </button>
-                </div>
-              </div>
             </div>
 
             {/* Feature Cards Grid */}

@@ -1,17 +1,15 @@
 import { DatabaseStatus } from '../components/common/DatabaseStatus';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Layers, Eye, EyeOff, Lock, Mail, ArrowRight, ShieldCheck, Sparkles } from 'lucide-react';
+import { Layers, Eye, EyeOff, Lock, Mail, ArrowRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { useToast } from '../context/ToastContext';
 
 export const LoginPage: React.FC = () => {
-  const { login, switchUser } = useAuth();
-  const { showToast } = useToast();
+  const { login } = useAuth();
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState('student.demo@campuscanva.local');
-  const [password, setPassword] = useState('CampusCanva123!');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -37,11 +35,6 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  const handleQuickDemo = async (userId: number) => {
-    try { await switchUser(userId); } catch { return; }
-    navigate('/dashboard');
-  };
-
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
@@ -63,39 +56,6 @@ export const LoginPage: React.FC = () => {
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-6 sm:px-10 shadow-xl border border-slate-200/80 rounded-3xl space-y-6">
           <DatabaseStatus />
-          {/* Quick Demo Access Bar */}
-          <div className="p-4 rounded-2xl bg-gradient-to-r from-indigo-50 to-purple-50 border border-indigo-100">
-            <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="w-4 h-4 text-indigo-600" />
-              <span className="text-xs font-bold text-indigo-950 uppercase tracking-wider">
-                Lab Evaluator 1-Click Access
-              </span>
-            </div>
-            <div className="grid grid-cols-3 gap-2">
-              <button
-                type="button"
-                onClick={() => handleQuickDemo(1)}
-                className="py-1.5 px-2 bg-white rounded-xl border border-indigo-200 text-[11px] font-bold text-indigo-700 hover:bg-indigo-50 transition shadow-2xs text-center"
-              >
-                Student
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickDemo(5)}
-                className="py-1.5 px-2 bg-white rounded-xl border border-purple-200 text-[11px] font-bold text-purple-700 hover:bg-purple-50 transition shadow-2xs text-center"
-              >
-                Faculty
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickDemo(7)}
-                className="py-1.5 px-2 bg-white rounded-xl border border-amber-200 text-[11px] font-bold text-amber-700 hover:bg-amber-50 transition shadow-2xs text-center"
-              >
-                Alumni
-              </button>
-            </div>
-          </div>
-
           {errorMsg && (
             <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs font-medium text-rose-700">
               {errorMsg}
@@ -155,7 +115,7 @@ export const LoginPage: React.FC = () => {
           </form>
 
           <div className="pt-2 text-center text-[11px] text-slate-400">
-            Evaluator buttons sign in to sample accounts. Regular sign-in verifies your password through
+            Sign in with your email and password. Authentication uses
             bcrypt and database-backed sessions on the Express/MySQL backend.
           </div>
         </div>

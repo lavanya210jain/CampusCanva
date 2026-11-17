@@ -23,3 +23,9 @@ The frontend-only practice fallback remains available but is not the database de
 - Lint completed with no errors; existing frontend cleanup warnings remain.
 
 See UPDATE_GUIDE.md for Windows ZIP updates that retain .env, uploaded files and the existing MySQL database.
+
+## Passwordless quick-access removal — 17 November 2026
+
+Removed evaluator cards from welcome/login, the navbar account switcher and the shared switch-user action. The old /api/auth/demo endpoint now rejects requests even with DEMO_LOGIN=true in an existing environment. Normal login fields start empty. Seeded accounts and saved memories remain intact; sign in with their email and password.
+
+Validation: 5 validation tests, 14 MySQL integration tests and 4 browser workflows passed. Browser assertions cover absent evaluator controls, blank credential fields, absent account switching and rejected passwordless login. Production build passed. No database migration is needed for this removal.

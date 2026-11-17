@@ -60,11 +60,11 @@ All seeded accounts use password **`CampusCanva123!`**.
 
 | Persona | Email | ID |
 | --- | --- | --- |
-| Student | kavya.cse@nsut.ac.in | 1 |
-| Faculty | vivek.mehta@nsut.ac.in | 5 |
-| Alumni | aman.alumni@nsut.ac.in | 7 |
+| Student | student.demo@campuscanva.local | 1 |
+| Faculty | faculty.demo@campuscanva.local | 5 |
+| Alumni | alumni.demo@campuscanva.local | 7 |
 
-With `DEMO_LOGIN=true`, evaluator buttons can sign in as only these three seeded personas. This is an explicit localhost presentation shortcut. Set `DEMO_LOGIN=false` to require passwords for everyone. Regular login always verifies a bcrypt password hash. Sessions are stored in MySQL; APIs derive the acting user from the session, not a submitted user ID. The SQL Inspector toggle only controls educational UI and never switches the database.
+All accounts require email and password. Quick evaluator login and persona switching have been removed. Legacy DEMO_LOGIN settings have no effect. Sessions are stored in MySQL; APIs derive the acting user from the session. The SQL Inspector toggle only controls educational UI.
 
 ## Database design
 

@@ -33,7 +33,7 @@ Only unchanged original sample identities are renamed; personalized account name
 | Demo Faculty | faculty.demo@campuscanva.local | CampusCanva123! |
 | Demo Alumni | alumni.demo@campuscanva.local | CampusCanva123! |
 
-The quick evaluator buttons still work when `DEMO_LOGIN=true`. Custom accounts keep their own credentials. The registration form uses generic examples and correctly shows the eight-character password minimum.
+Quick evaluator buttons and account switching have been removed; all accounts sign in with email and password. An old `DEMO_LOGIN` setting has no effect. Custom accounts keep their own credentials. The registration form uses generic examples and correctly shows the eight-character password minimum.
 
 ## Public/private spaces
 

@@ -46,7 +46,6 @@ app.get("/api/health", async (req, res) => {
     res.json({
       status: "ok",
       database: "mysql",
-      demoLogin: process.env.DEMO_LOGIN === "true",
     });
   } catch {
     res.status(503).json({
@@ -122,18 +121,8 @@ app.post("/api/auth/register", async (req, res) => {
   await createSession(res, user.user_id);
   res.status(201).json(user);
 });
-app.post("/api/auth/demo", async (req, res) => {
-  if (process.env.DEMO_LOGIN !== "true")
-    fail(403, "Evaluator login is disabled. Use email and password.");
-  const uid = v.id.parse(req.body.userId);
-  // Only the original seeded personas can bypass passwords in explicit localhost demo mode.
-  if (![1, 5, 7].includes(uid))
-    fail(403, "Choose the seeded Student, Faculty or Alumni evaluator account");
-  const user = await userProfile(uid);
-  await removeSession(req, res);
-  await createSession(res, uid);
-  res.json(user);
-});
+// Reject old clients explicitly, even if a previous .env still enables DEMO_LOGIN.
+app.post('/api/auth/demo', (req,res)=>res.status(404).json({message:'Quick login has been removed. Sign in with email and password.'}));
 app.post("/api/auth/logout", async (req, res) => {
   await removeSession(req, res);
   res.json({ ok: true });

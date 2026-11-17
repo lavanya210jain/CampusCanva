@@ -32,7 +32,7 @@ interface ProfilePageProps {
 export const ProfilePage: React.FC<ProfilePageProps> = ({
   onOpenMediaLightbox,
 }) => {
-  const { currentUser, updateProfile, switchUser, allUsers } = useAuth();
+  const { currentUser, updateProfile } = useAuth();
   const { showToast } = useToast();
   const { openInspector, isDemoMode } = useDemo();
 

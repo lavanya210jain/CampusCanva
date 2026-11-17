@@ -61,12 +61,7 @@ function normalize(value: unknown): unknown {
 export const sessionApi = {
   me: () => request<FullUserProfile>("/auth/me"),
   logout: () => request("/auth/logout", "POST"),
-  demo: (userId: number) =>
-    request<FullUserProfile>("/auth/demo", "POST", { userId }),
-  health: () =>
-    request<{ status: string; database: string; demoLogin: boolean }>(
-      "/health",
-    ),
+  health: () => request<{ status: string; database: string }>("/health"),
 };
 export const liveApi: Omit<typeof demoApi, "getDBMSMeta"> & {
   getDBMSMeta: (
@@ -177,10 +172,20 @@ export function uploadMemory(
   });
 }
 
-export async function uploadAvatar(file:File, updates:Partial<User>):Promise<FullUserProfile> {
-  const body=new FormData();body.append('file',file);body.append('profile',JSON.stringify(updates));
-  const response=await fetch('/api/profile/avatar',{method:'POST',body,credentials:'same-origin'});
-  const data=await response.json();
-  if(!response.ok)throw new Error(data.message||'Could not upload profile photo');
+export async function uploadAvatar(
+  file: File,
+  updates: Partial<User>,
+): Promise<FullUserProfile> {
+  const body = new FormData();
+  body.append("file", file);
+  body.append("profile", JSON.stringify(updates));
+  const response = await fetch("/api/profile/avatar", {
+    method: "POST",
+    body,
+    credentials: "same-origin",
+  });
+  const data = await response.json();
+  if (!response.ok)
+    throw new Error(data.message || "Could not upload profile photo");
   return normalize(data) as FullUserProfile;
 }

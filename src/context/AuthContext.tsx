@@ -9,7 +9,7 @@ interface AuthContextValue {
   isAuthenticated: boolean;
   isLoading: boolean;
   allUsers: User[];
-  login: (email: string, passwordHash?: string) => Promise<void>;
+  login: (email: string, passwordHash: string) => Promise<void>;
   register: (
     userData: RegistrationInput,
     specialized: {
@@ -19,7 +19,6 @@ interface AuthContextValue {
     }
   ) => Promise<void>;
   logout: () => void;
-  switchUser: (userId: number) => Promise<void>;
   updateProfile: (updates: Partial<User>, avatarFile?: File) => Promise<void>;
   refreshUsers: () => Promise<void>;
 }
@@ -58,8 +57,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
         await refreshUsers();
         const storedUserId = localStorage.getItem(AUTH_STORAGE_KEY);
-        // Default to user_id: 1 (Kavya Gupta, Student Lead) for immediate seamless demo
-        const targetId = storedUserId ? parseInt(storedUserId, 10) : 1;
+        if (!storedUserId) return;
+        const targetId = parseInt(storedUserId, 10);
         const profile = await api.getUserProfile(targetId);
         if (profile) {
           setCurrentUser(profile);
@@ -74,7 +73,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     initAuth();
   }, []);
 
-  const login = async (email: string, passwordHash = 'demo_pass') => {
+  const login = async (email: string, passwordHash: string) => {
     setIsLoading(true);
     try {
       const user = await api.login(email, passwordHash);
@@ -125,21 +124,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     showToast('Signed out.', 'info');
   };
 
-  const switchUser = async (userId: number) => {
-    try {
-      const user = isMockMode ? await api.getUserProfile(userId) : await sessionApi.demo(userId);
-      if (user) {
-        setCurrentUser(user);
-        localStorage.setItem(AUTH_STORAGE_KEY, user.user_id.toString());
-        await refreshUsers();
-        showToast(`Switched active persona to ${user.full_name} (${user.user_type})`, 'info');
-      }
-    } catch (err) {
-      showToast(err instanceof Error ? err.message : 'Could not switch user', 'error');
-      throw err;
-    }
-  };
-
   const updateProfile = async (updates: Partial<User>, avatarFile?: File) => {
     if (!currentUser) return;
     try {
@@ -163,7 +147,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         login,
         register,
         logout,
-        switchUser,
         updateProfile,
         refreshUsers,
       }}

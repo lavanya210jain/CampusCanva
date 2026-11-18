@@ -244,7 +244,7 @@ export const SpaceDetailPage: React.FC<SpaceDetailPageProps> = ({
       <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xs">
         {/* Cover Image */}
         <div className="relative h-64 sm:h-80 w-full overflow-hidden bg-slate-900">
-          <ImageWithFallback variant="cover"
+          <ImageWithFallback variant="cover" coverKey={space.space_id}
                     src={space.cover_url}
             alt={space.title}
             className={`w-full h-full object-cover ${isLocked ? "filter blur-xs brightness-75" : ""}`}

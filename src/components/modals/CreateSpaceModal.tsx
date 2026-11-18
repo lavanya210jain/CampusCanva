@@ -1,3 +1,4 @@
+import { coverPalette } from "../../../shared/coverPalette.js";
 import { useDialog } from "../../hooks/useDialog";
 import React, { useState } from "react";
 import { X, Lock, Sparkles, Image as ImageIcon, MapPin } from "lucide-react";
@@ -241,15 +242,30 @@ export const CreateSpaceModal: React.FC<CreateSpaceModalProps> = ({
               />
             </div>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Leave this empty for a solid forest-green cover that matches the
-              app.
+              Leave this empty for an automatic cover colour. Each space gets
+              its own consistent colour from this palette.
             </p>
             {!coverUrl.trim() && (
               <div
-                role="img"
-                aria-label="Default forest-green cover preview"
-                className="h-16 rounded-xl bg-teal-700 dark:bg-teal-900"
-              />
+                role="group"
+                aria-label="Automatic cover colours"
+                className="flex gap-2"
+              >
+                {coverPalette.map((colour) => (
+                  <span
+                    key={colour.name}
+                    role="img"
+                    aria-label={`${colour.name} cover example`}
+                    className="automatic-space-cover h-12 flex-1 rounded-lg"
+                    style={
+                      {
+                        "--cover-light": colour.light,
+                        "--cover-dark": colour.dark,
+                      } as React.CSSProperties
+                    }
+                  />
+                ))}
+              </div>
             )}
           </div>
 

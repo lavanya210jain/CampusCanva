@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { ImageOff, UserRound } from "lucide-react";
+import { coverForKey } from "../../../shared/coverPalette.js";
 interface ImageWithFallbackProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   fallbackSrc?: string;
+  coverKey?: string | number;
   variant?: "media" | "avatar" | "cover";
 }
 export const ImageWithFallback: React.FC<ImageWithFallbackProps> = ({
@@ -10,11 +12,17 @@ export const ImageWithFallback: React.FC<ImageWithFallbackProps> = ({
   className = "",
   fallbackSrc = "",
   variant = "media",
+  coverKey,
   onLoad,
   onError,
   ...props
 }) => {
   const source = src?.trim() || fallbackSrc;
+  const colour = coverForKey(coverKey ?? alt);
+  const coverStyle = {
+    "--cover-light": colour.light,
+    "--cover-dark": colour.dark,
+  } as React.CSSProperties;
   const [failedSource, setFailedSource] = useState<string | null>(null);
   const [loadedSource, setLoadedSource] = useState<string | null>(null);
   const missing = !source || failedSource === source;
@@ -37,9 +45,11 @@ export const ImageWithFallback: React.FC<ImageWithFallbackProps> = ({
         ) : variant === "cover" ? (
           <div
             role="img"
-            aria-label={`${alt}: solid forest-green cover`}
+            aria-label={`${alt}: solid ${colour.name} cover`}
+            data-cover-color={colour.name}
+            style={coverStyle}
             data-testid="space-cover-placeholder"
-            className="w-full h-full bg-teal-700 dark:bg-teal-900"
+            className="w-full h-full automatic-space-cover"
           />
         ) : (
           <div

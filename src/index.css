@@ -1043,3 +1043,7 @@ html.dark {
     transform: none;
   }
 }
+
+/* Automatically assigned per-space covers; uploaded/custom images take priority. */
+.automatic-space-cover { background-color: var(--cover-light); }
+.dark .automatic-space-cover { background-color: var(--cover-dark); }

@@ -29,7 +29,7 @@ export const SpaceCard: React.FC<SpaceCardProps> = ({
       <div>
         {/* Cover Image Container */}
         <div className="relative aspect-16/10 overflow-hidden bg-slate-100 dark:bg-slate-900">
-          <ImageWithFallback variant="cover"
+          <ImageWithFallback variant="cover" coverKey={space.space_id}
                     src={space.cover_url}
             alt={space.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"

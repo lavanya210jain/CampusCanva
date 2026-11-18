@@ -359,7 +359,15 @@ test("feature previews respond to selection and theme persists across public and
         .click();
     } else await page.goto(path);
     await expect(page.locator("h1")).toBeVisible();
-    await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), {message:`No horizontal overflow on ${path}`}).toBe(true);
+    await expect
+      .poll(
+        () =>
+          page.evaluate(
+            () => document.documentElement.scrollWidth <= innerWidth,
+          ),
+        { message: `No horizontal overflow on ${path}` },
+      )
+      .toBe(true);
     await expect(
       page.getByRole("button", { name: "Switch to light mode", exact: true }),
     ).toBeVisible();
@@ -448,7 +456,7 @@ test("missing profile photos stay blank and new spaces use a solid themed cover"
     const dialog = page.getByRole("dialog", { name: "Create memory space" });
     await expect(dialog.locator('input[type="url"]')).toHaveValue("");
     await expect(
-      dialog.getByRole("img", { name: "Default forest-green cover preview" }),
+      dialog.getByRole("group", { name: "Automatic cover colours" }),
     ).toBeVisible();
     await dialog
       .getByPlaceholder("e.g. Moksha 2026, Manali Trip, Batch of 2025")
@@ -484,5 +492,81 @@ test("missing profile photos stay blank and new spaces use a solid themed cover"
       data: { avatar_url: user.avatar_url || "" },
     });
     if (spaceId) await page.request.delete(`/api/spaces/${spaceId}`);
+  }
+});
+
+test("automatic covers vary by space and stay consistent across reloads, cards and dark mode", async ({
+  page,
+}) => {
+  await page.goto("/login");
+  await page
+    .locator('input[type="email"]')
+    .fill("student.demo@campuscanva.local");
+  await page.locator('input[type="password"]').fill("CampusCanva123!");
+  await page.getByRole("button", { name: "Sign In", exact: true }).click();
+  await expect(page).toHaveURL(/\/dashboard$/);
+  const ids = [];
+  try {
+    for (let index = 0; index < 2; index++) {
+      const result = await page.request.post("/api/spaces", {
+        data: {
+          title: `Cover colours ${Date.now()} ${index}`,
+          space_type: "General",
+          cover_url: "",
+        },
+      });
+      expect(result.status()).toBe(201);
+      ids.push((await result.json()).space_id);
+    }
+    await page.goto(`/spaces/${ids[0]}`);
+    const cover = page.getByTestId("space-cover-placeholder");
+    await expect(cover).toBeVisible();
+    const first = await cover.getAttribute("data-cover-color");
+    await page.reload();
+    await expect(cover).toHaveAttribute("data-cover-color", first);
+    await page.goto("/my-spaces");
+    await expect(
+      page
+        .locator(`a[href="/spaces/${ids[0]}"]`)
+        .getByTestId("space-cover-placeholder"),
+    ).toHaveAttribute("data-cover-color", first);
+    await page.goto(`/spaces/${ids[1]}`);
+    await expect(cover).toBeVisible();
+    const second = await cover.getAttribute("data-cover-color");
+    expect(second).not.toBe(first);
+    const light = await cover.evaluate(
+      (element) => getComputedStyle(element).backgroundColor,
+    );
+    await page
+      .getByRole("button", { name: "Switch to dark mode", exact: true })
+      .click();
+    await expect(cover).toHaveAttribute("data-cover-color", second);
+    expect(
+      await cover.evaluate(
+        (element) => getComputedStyle(element).backgroundColor,
+      ),
+    ).not.toBe(light);
+    const url = "https://example.edu/custom-cover.png";
+    await page.route(url, (route) =>
+      route.fulfill({
+        contentType: "image/png",
+        body: Buffer.from(
+          "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aH0cAAAAASUVORK5CYII=",
+          "base64",
+        ),
+      }),
+    );
+    expect(
+      (
+        await page.request.patch(`/api/spaces/${ids[1]}`, {
+          data: { cover_url: url },
+        })
+      ).status(),
+    ).toBe(200);
+    await page.reload();
+    await expect(page.locator(`img[src="${url}"]`)).toBeVisible();
+    await expect(page.getByTestId("space-cover-placeholder")).toHaveCount(0);
+  } finally {
+    for (const id of ids) await page.request.delete(`/api/spaces/${id}`);
   }
 });

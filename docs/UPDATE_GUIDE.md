@@ -85,7 +85,7 @@ Apply this update using the ZIP/copy steps above, preserving `.env` and `server/
 
 SQL Inspector now starts off. Database Lab appears in the desktop/mobile navigation only after you enable the SQL Inspector button. Turning it off redirects an open Lab page to Dashboard, hides the link and closes the inspector drawer. Directly opening `/database-lab` while it is off also returns to Dashboard. This is a display mode, not an additional user role or restriction on privileged direct MySQL access.
 
-New accounts have no assigned profile photograph. A neutral empty-avatar symbol is used until a user supplies a photo. New spaces start with no cover URL and display a solid forest-green cover matching the light/dark theme. Optional custom cover URLs still work. Missing or broken images never trigger a random stock-photo fallback.
+New accounts have no assigned profile photograph. A neutral empty-avatar symbol is used until a user supplies a photo. New spaces start with no cover URL and automatically receive a solid cover from a varied, theme-matching palette. Optional custom cover URLs still work. Missing or broken images never trigger a random stock-photo fallback.
 
 The upgrade clears recognized automatically assigned stock profile images and old default covers once. It preserves uploaded files and custom URLs. The `app_migration` bookkeeping table records the cleanup so subsequent restarts do not repeat it or undo later image choices. There are now 16 tables in the schema: the existing 15 plus this small bookkeeping table.
 
@@ -97,3 +97,10 @@ npm.cmd run dev
 ```
 
 The API also applies the upgrade automatically on startup. Do not run `db:reset`; it would replace your saved data with the original sample dataset.
+
+
+## Varied automatic cover colours
+
+Spaces without a supplied cover now use forest, terracotta, ochre, sage, olive or rosewood rather than a single green background. The space ID selects the palette entry, so consecutive spaces vary and each space keeps the same colour across cards, its detail page, users and refreshes. Dark mode uses a coordinated darker shade of that colour. Existing empty covers automatically gain the varied colours too. Supplying a custom image overrides the colour placeholder.
+
+The creation form previews the available palette. No database migration is required for this colour update; it is a display choice calculated from each existing space ID.

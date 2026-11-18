@@ -41,3 +41,8 @@ Validation: production build and validation tests passed; all 5 browser workflow
 Production build and all 5 validation tests passed. All 15 MySQL integration tests passed, including account creation without an avatar and one-time legacy-image cleanup that preserves custom URLs and later user choices. All 7 browser workflows were verified, including hidden/direct-route Database Lab gating, toggling it off while open, mobile navigation, empty profile placeholders and solid themed covers. A transient font/layout measurement was stabilized with a polling assertion; the final focused theme/gating/image checks passed.
 
 Legacy-image migration runs transactionally with a persisted marker under the existing upgrade lock. No uploaded files, user accounts, memberships or memories are deleted.
+
+
+## Automatic per-space cover colours — 18 November 2026
+
+Production build and all 7 unit/validation tests passed. Focused browser checks cover varied colours for consecutive spaces, consistency across cards/detail/reload, dark-mode shades and custom-image precedence. The existing no-profile-photo / empty-cover workflow was also checked. No database fields or stored memory data change.

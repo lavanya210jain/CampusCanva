@@ -44,28 +44,6 @@ Install **Node.js 22.12+** (Node 24 LTS recommended), npm, and **MySQL 8.0.16+**
 
 If using XAMPP, start its MySQL service and use its configured port/credentials. The code was tested on MySQL 8.4; MariaDB/XAMPP compatibility is intended but has not been separately verified.
 
-### Optional Docker database
-
-If Docker Desktop is already installed, instead of installing MySQL directly:
-
-```sh
-docker compose up -d
-```
-
-Wait for the database to become healthy (`docker compose ps`), then set `DB_PORT=3307` and `DB_PASSWORD=campuscanva-local` in `.env`. Follow steps 5–7 above. The Compose volume retains the database when the container stops. `docker compose down` stops it; do not use `down -v` unless you want to erase its data.
-
-## Seeded Accounts for demo
-
-All seeded accounts use password **`CampusCanva123!`**.
-
-| Persona | Email | ID |
-| --- | --- | --- |
-| Student | student.demo@campuscanva.local | 1 |
-| Faculty | faculty.demo@campuscanva.local | 5 |
-| Alumni | alumni.demo@campuscanva.local | 7 |
-
-All accounts require email and password. Quick evaluator login and persona switching have been removed. Legacy DEMO_LOGIN settings have no effect. Sessions are stored in MySQL; APIs derive the acting user from the session. SQL Inspector starts off; enable it to reveal Database Lab. Disabling it hides the page and redirects to Dashboard.
-
 ## Database design
 
 `database/schema.sql` defines 16 tables (15 existing application tables plus `app_migration` upgrade bookkeeping), two views, foreign keys, composite/unique keys, CHECK constraints, and triggers. `server/setup.ts` creates the schema and loads the realistic TypeScript seed dataset into SQL inside a transaction. Passwords are hashed during seeding.
